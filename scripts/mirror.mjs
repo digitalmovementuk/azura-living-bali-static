@@ -70,9 +70,13 @@ function cleanMarkup(text) {
 
 function cleanPage(text) {
   let output = cleanMarkup(text);
+  output = output.replaceAll(
+    '"touchcancel","wheel","click"',
+    '"touchcancel","click"',
+  );
   output = output.replace(
     '<video class="elementor-background-video-hosted" role="presentation" autoplay muted playsinline loop></video>',
-    '<video class="elementor-background-video-hosted" role="presentation" src="/wp-content/uploads/2025/08/Azura-Hero-Sunset.mp4" preload="metadata" autoplay muted playsinline loop></video>',
+    '<video class="elementor-background-video-hosted" data-azura-hero-video role="presentation" src="/wp-content/uploads/2025/08/Azura-Hero-Sunset.mp4" poster="/wp-content/uploads/2025/08/Bildschirmfoto-2025-08-18-um-19.04.37-scaled.jpg" preload="metadata" autoplay muted playsinline loop></video>',
   );
   output = output.replace(
     '<h2 class="elementor-heading-title elementor-size-default">Boutique Villas <br />  by Azura</h2>',
@@ -119,6 +123,10 @@ function cleanPage(text) {
     '<a class="scroll-link" href="#page-content" data-target="$1">',
   );
   output = output.replace(
+    /<script\b[^>]*data-rocket-src="[^"]*lenis[^"]*"[^>]*><\/script>\s*<script type="rocketlazyloadscript">[\s\S]*?new Lenis\([\s\S]*?<\/script>\s*<style>[\s\S]*?scroll-behavior:\s*auto[\s\S]*?<\/style>/i,
+    "",
+  );
+  output = output.replace(
     /(<div data-elementor-type="wp-page" data-elementor-id="4371")/i,
     '<span id="page-content"></span>$1',
   );
@@ -135,15 +143,83 @@ function cleanPage(text) {
   );
   output = output.replace(
     "</head>",
-    `<style id="azura-static-recovery-css">
+    `<link rel="preload" as="image" href="/wp-content/uploads/2025/08/Bildschirmfoto-2025-08-18-um-19.04.37-scaled.jpg" fetchpriority="high">
+<style id="azura-static-recovery-css">
+.elementor-element-cf6720d {
+  background-color: #0b0d0c !important;
+  background-image: linear-gradient(rgba(6, 8, 8, .28), rgba(6, 8, 8, .4)), url('/wp-content/uploads/2025/08/Bildschirmfoto-2025-08-18-um-19.04.37-scaled.jpg') !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+  background-size: cover !important;
+}
+.elementor-element-cf6720d .elementor-background-video-container {
+  overflow: hidden !important;
+  background-color: #0b0d0c !important;
+  background-image: linear-gradient(rgba(6, 8, 8, .28), rgba(6, 8, 8, .4)), url('/wp-content/uploads/2025/08/Bildschirmfoto-2025-08-18-um-19.04.37-scaled.jpg') !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+  background-size: cover !important;
+}
 .elementor-element-cf6720d .elementor-background-video-hosted {
   width: 100% !important;
   height: 100% !important;
   inset: 0 !important;
-  transform: none !important;
+  opacity: 0;
+  transform: translateZ(0) scale(1.008) !important;
   object-fit: cover !important;
+  backface-visibility: hidden;
+  transition: opacity .45s ease;
+  will-change: opacity;
 }
-</style>\n</head>`,
+.elementor-element-cf6720d .elementor-background-video-hosted.azura-video-ready {
+  opacity: 1;
+}
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 72px;
+}
+html.azura-lenis-active {
+  scroll-behavior: auto !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .elementor-element-cf6720d .elementor-background-video-hosted { transition: none; }
+}
+</style>
+<script defer src="/wp-content/cache/min/1/gh/studio-freight/lenis@0.2.28/bundled/lenis.js"></script>
+<script id="azura-runtime-polish">
+document.addEventListener('DOMContentLoaded', function () {
+  var video = document.querySelector('[data-azura-hero-video]');
+  if (video) {
+    var revealVideo = function () { video.classList.add('azura-video-ready'); };
+    if (video.readyState >= 3) revealVideo();
+    else video.addEventListener('canplay', revealVideo, { once: true });
+    video.muted = true;
+    var playback = video.play();
+    if (playback && playback.catch) playback.catch(function () {});
+  }
+
+  var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var finePointer = window.matchMedia('(pointer: fine)').matches;
+  if (!reducedMotion && finePointer && window.Lenis) {
+    var lenis = new Lenis({
+      duration: 0.95,
+      easing: function (t) { return Math.min(1, 1.001 - Math.pow(2, -10 * t)); },
+      direction: 'vertical',
+      gestureDirection: 'vertical',
+      smooth: true,
+      smoothTouch: false,
+      mouseMultiplier: 0.9,
+      touchMultiplier: 1.5,
+      infinite: false
+    });
+    document.documentElement.classList.add('azura-lenis-active');
+    window.azuraLenis = lenis;
+    var raf = function (time) { lenis.raf(time); requestAnimationFrame(raf); };
+    requestAnimationFrame(raf);
+  }
+});
+</script>\n</head>`,
   );
   return output;
 }
