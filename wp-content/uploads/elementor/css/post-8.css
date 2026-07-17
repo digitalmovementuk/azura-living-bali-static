@@ -1,0 +1,84 @@
+.elementor-kit-8{--e-global-color-primary:#2E2E2E;--e-global-color-secondary:#F7F7F7;--e-global-color-text:#A6A6A6;--e-global-color-accent:#CFB010;--e-global-color-3d1a31d:#000000;--e-global-color-5587ff0:#FDF9EE;--e-global-color-1059c02:#F0E7D9;--e-global-color-5375817:#2C2C2C;--e-global-color-b956814:#EBBE26;--e-global-color-6903183:#FAF5EF;--e-global-color-83731f3:#E6E1D8;--e-global-typography-primary-font-family:"Lora";--e-global-typography-primary-font-weight:600;--e-global-typography-secondary-font-family:"Inter";--e-global-typography-secondary-font-size:14px;--e-global-typography-secondary-font-weight:400;--e-global-typography-text-font-family:"Inter";--e-global-typography-text-font-weight:400;--e-global-typography-accent-font-family:"Inter";--e-global-typography-accent-font-weight:500;--e-global-typography-3065804-font-family:"Josefin Sans";--e-global-typography-3065804-font-size:11px;--e-global-typography-08e8475-font-family:"Inter";font-family:"Lora", Sans-serif;}.elementor-kit-8 button,.elementor-kit-8 input[type="button"],.elementor-kit-8 input[type="submit"],.elementor-kit-8 .elementor-button{background-color:#F7F7F700;font-size:22px;font-weight:500;color:var( --e-global-color-secondary );border-style:solid;border-width:1px 1px 1px 1px;border-color:var( --e-global-color-secondary );border-radius:80px 80px 80px 80px;}.elementor-kit-8 e-page-transition{background-color:#FFBC7D;}.elementor-kit-8 h1{font-family:"Lora", Sans-serif;}.elementor-kit-8 h2{font-family:"Lora", Sans-serif;}.elementor-kit-8 h3{font-family:"Inter", Sans-serif;}.elementor-kit-8 h4{font-family:"Inter", Sans-serif;}.elementor-kit-8 h5{font-family:"Inter", Sans-serif;}.elementor-kit-8 h6{font-family:"Inter", Sans-serif;}.elementor-section.elementor-section-boxed > .elementor-container{max-width:1436px;}.e-con{--container-max-width:1436px;--container-default-padding-top:0px;--container-default-padding-right:20px;--container-default-padding-bottom:0px;--container-default-padding-left:20px;}.elementor-widget:not(:last-child){margin-block-end:20px;}.elementor-element{--widgets-spacing:20px 20px;--widgets-spacing-row:20px;--widgets-spacing-column:20px;}{}h1.entry-title{display:var(--page-title-display);}@media(max-width:1024px){.elementor-section.elementor-section-boxed > .elementor-container{max-width:100%;}.e-con{--container-max-width:100%;--container-default-padding-top:0px;--container-default-padding-right:20px;--container-default-padding-bottom:0px;--container-default-padding-left:20px;}}@media(max-width:767px){.elementor-kit-8{--e-global-typography-08e8475-font-size:16px;}.elementor-section.elementor-section-boxed > .elementor-container{max-width:100%;}.e-con{--container-max-width:100%;--container-default-padding-top:0px;--container-default-padding-right:20px;--container-default-padding-bottom:0px;--container-default-padding-left:20px;}}/* Start custom CSS *//* Font untuk Semua Elemen */
+body, p, li, span,
+input, textarea, select,
+.elementor-button, a {
+    
+}
+
+/* Judul dengan Ketebalan Sedang */
+h1, h2, h3, h4, h5, h6, .elementor-heading-title {
+    font-weight: 500;
+    /*font-family: 'lora' !important;*/
+    font-family: 'the seasons', sans-serif;
+}
+
+/* Teks Konten Umum */
+p {
+    font-weight: 400;
+ font-family: 'inter', sans-serif !important;
+      /*font-family: 'josefin sans' !important;*/
+
+}
+
+/* Tampilan untuk Link (tanpa warna) */
+a {
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+a:hover {
+    opacity: 0.8;
+}
+
+/* Penyesuaian untuk Tombol */
+.elementor-button {
+    font-weight: 500;
+    border-radius: 8px;
+    padding: 10px 20px;
+    transition: all 0.3s;
+}
+
+.elementor-button:hover {
+    opacity: 0.9;
+}
+
+/* Kustomisasi Form Input */
+input, textarea, select {
+    border-radius: 5px;
+    padding: 10px;
+}
+
+/* Responsive untuk Mobile */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 2rem;
+    }
+    h2, h3 {
+        font-size: 1.75rem;
+    }
+    p, li {
+        font-size: 1rem;
+    }
+}
+
+
+.montserrat-text{
+    font-family: 'montserrat' !important;
+}
+
+/*Accordion animation Override*/
+
+.elementor-accordion .elementor-tab-content {
+  max-height: 0;
+  opacity: 0;
+  padding: 0 15px;
+  pointer-events: none;
+}
+
+.elementor-accordion .elementor-active .elementor-tab-content {
+  max-height: 500px; /* or any large-enough value */
+  opacity: 1;
+  padding: 15px;
+  pointer-events: auto;
+  transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out;
+}/* End custom CSS */
