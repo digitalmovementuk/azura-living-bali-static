@@ -1,3 +1,10 @@
+node_modules
+dist
 .DS_Store
-qa/
-*.log
+lighthouse-*.html
+source-assets/
+tests/screenshots/
+tests/qa-report.json
+*.tsbuildinfo
+vite.config.js
+vite.config.d.ts
