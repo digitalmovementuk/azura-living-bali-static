@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://azuralivingbali.com/sitemap.xml

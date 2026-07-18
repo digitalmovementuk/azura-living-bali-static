@@ -1,10 +1,26 @@
-# Azura Living Bali — static recovery
+# Azura Living Bali — premium redesign
 
-Plain HTML/CSS/JavaScript recovery of the existing Azura Living Bali website.
+Responsive React/Vite redesign for Azura Living Bali, including the founder story, original property media, investment information, and an accessible premium interaction system.
 
-- `scripts/mirror.mjs` captures the live page and its same-domain assets.
-- `recovery/maps/` replaces the deleted Netlify map dependency.
-- `recovery/silk/` replaces the deleted Netlify silk dependency.
-- `public/` is the deployable document root.
+## Local preview
 
-Run `node scripts/mirror.mjs`, then copy `recovery/` into `public/recovery/` before preview or deployment.
+```bash
+npm install
+npm run dev
+```
+
+## Production build
+
+```bash
+npm run build
+```
+
+The production output is created in `dist/`.
+
+## Quality checks
+
+```bash
+npm run qa
+```
+
+The QA suite checks five desktop and mobile viewport sizes, video autoplay, navigation, overflow, broken images, browser errors, and accessibility.
