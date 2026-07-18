@@ -70,17 +70,27 @@ function cleanMarkup(text) {
 
 function cleanPage(text) {
   let output = cleanMarkup(text);
+  output = output.replace(
+    "<head>",
+    `<head><link rel="preload" as="image" href="/assets/images/azura-hero-poster.jpg" fetchpriority="high">
+<link rel="preload" as="image" href="/wp-content/uploads/2025/02/output-onlinepngtools-300x66.png" fetchpriority="high">
+<style id="azura-critical-start">html{background:#0b0d0c}body{margin:0;background:#0b0d0c}body.home.page-id-4371 .elementor-4371 .elementor-element.elementor-element-cf6720d,body.home.page-id-4371 .elementor-4371 .elementor-element.elementor-element-cf6720d .elementor-background-video-container{background-color:#0b0d0c!important;background-image:linear-gradient(rgba(6,8,8,.28),rgba(6,8,8,.4)),url('/assets/images/azura-hero-poster.jpg')!important;background-position:center!important;background-repeat:no-repeat!important;background-size:cover!important}</style>`,
+  );
   output = output.replaceAll(
     '"touchcancel","wheel","click"',
     '"touchcancel","click"',
   );
   output = output.replace(
     '<video class="elementor-background-video-hosted" role="presentation" autoplay muted playsinline loop></video>',
-    '<video class="elementor-background-video-hosted" data-azura-hero-video role="presentation" src="/wp-content/uploads/2025/08/Azura-Hero-Sunset.mp4" poster="/wp-content/uploads/2025/08/Bildschirmfoto-2025-08-18-um-19.04.37-scaled.jpg" preload="metadata" autoplay muted playsinline loop></video>',
+    '<video class="elementor-background-video-hosted" data-azura-hero-video role="presentation" src="/wp-content/uploads/2025/08/Azura-Hero-Sunset.mp4" poster="/assets/images/azura-hero-poster.jpg" preload="metadata" autoplay muted playsinline loop></video>',
   );
   output = output.replace(
     '<h2 class="elementor-heading-title elementor-size-default">Boutique Villas <br />  by Azura</h2>',
     '<h1 class="elementor-heading-title elementor-size-default">Boutique Villas <br />  by Azura</h1>',
+  );
+  output = output.replace(
+    /(<div class="elementor-element elementor-element-dd0ada2[\s\S]*?<a href="\/">\s*)<img[^>]*wp-image-1221[^>]*\/?>\s*<noscript>[\s\S]*?<\/noscript>/i,
+    '$1<img width="300" height="66" src="/wp-content/uploads/2025/02/output-onlinepngtools-300x66.png" class="attachment-full size-full wp-image-1221" alt="Azura Living Bali" loading="eager" fetchpriority="high" decoding="async" />',
   );
   output = output.replace(
     /<h1 class="elementor-heading-title elementor-size-default">(Vision|Payment Terms)<\/h1>/g,
@@ -115,6 +125,10 @@ function cleanPage(text) {
     '<iframe title="Embedded content"$1>',
   );
   output = output.replace(
+    /src="about:blank"([^>]*?)\s+data-rocket-lazyload="fitvidscompatible"\s+data-lazy-src="\/recovery\/maps\/"/gi,
+    'src="/recovery/maps/"$1',
+  );
+  output = output.replace(
     '<label class="hamburger" for="menu-toggle">',
     '<label class="hamburger" for="menu-toggle" aria-label="Open navigation menu">',
   );
@@ -143,19 +157,18 @@ function cleanPage(text) {
   );
   output = output.replace(
     "</head>",
-    `<link rel="preload" as="image" href="/wp-content/uploads/2025/08/Bildschirmfoto-2025-08-18-um-19.04.37-scaled.jpg" fetchpriority="high">
-<style id="azura-static-recovery-css">
-.elementor-element-cf6720d {
+    `<style id="azura-static-recovery-css">
+body.home.page-id-4371 .elementor-4371 .elementor-element.elementor-element-cf6720d {
   background-color: #0b0d0c !important;
-  background-image: linear-gradient(rgba(6, 8, 8, .28), rgba(6, 8, 8, .4)), url('/wp-content/uploads/2025/08/Bildschirmfoto-2025-08-18-um-19.04.37-scaled.jpg') !important;
+  background-image: linear-gradient(rgba(6, 8, 8, .28), rgba(6, 8, 8, .4)), url('/assets/images/azura-hero-poster.jpg') !important;
   background-position: center center !important;
   background-repeat: no-repeat !important;
   background-size: cover !important;
 }
-.elementor-element-cf6720d .elementor-background-video-container {
+body.home.page-id-4371 .elementor-4371 .elementor-element.elementor-element-cf6720d .elementor-background-video-container {
   overflow: hidden !important;
   background-color: #0b0d0c !important;
-  background-image: linear-gradient(rgba(6, 8, 8, .28), rgba(6, 8, 8, .4)), url('/wp-content/uploads/2025/08/Bildschirmfoto-2025-08-18-um-19.04.37-scaled.jpg') !important;
+  background-image: linear-gradient(rgba(6, 8, 8, .28), rgba(6, 8, 8, .4)), url('/assets/images/azura-hero-poster.jpg') !important;
   background-position: center center !important;
   background-repeat: no-repeat !important;
   background-size: cover !important;
@@ -164,15 +177,18 @@ function cleanPage(text) {
   width: 100% !important;
   height: 100% !important;
   inset: 0 !important;
+  inset-block-start: 0 !important;
+  inset-inline-start: 0 !important;
   opacity: 0;
-  transform: translateZ(0) scale(1.008) !important;
+  transform: none !important;
   object-fit: cover !important;
   backface-visibility: hidden;
-  transition: opacity .45s ease;
+  transition: opacity .14s linear;
   will-change: opacity;
 }
 .elementor-element-cf6720d .elementor-background-video-hosted.azura-video-ready {
   opacity: 1;
+  will-change: auto;
 }
 /* Use direct local imagery so these sections never fall back to WordPress grey. */
 body.home.page-id-4371 .elementor-4371 .elementor-element.elementor-element-853059a:not(.elementor-motion-effects-element-type-background),
@@ -213,7 +229,7 @@ html.azura-lenis-active {
 }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .elementor-element-cf6720d .elementor-background-video-hosted { transition: none; }
+  .elementor-element-cf6720d .elementor-background-video-hosted { display: none; transition: none; }
 }
 @media (max-width: 767px) {
   .elementor-4223 .elementor-element.elementor-element-8f851bb {
@@ -228,17 +244,42 @@ html.azura-lenis-active {
 document.addEventListener('DOMContentLoaded', function () {
   var video = document.querySelector('[data-azura-hero-video]');
   if (video) {
-    var revealVideo = function () { video.classList.add('azura-video-ready'); };
-    if (!video.paused && video.readyState >= 2) revealVideo();
-    video.addEventListener('playing', revealVideo, { once: true });
-    video.muted = true;
-    var ensurePlayback = function () {
-      if (document.visibilityState !== 'visible') return;
-      var playback = video.play();
-      if (playback && playback.catch) playback.catch(function () {});
-    };
-    ensurePlayback();
-    document.addEventListener('visibilitychange', ensurePlayback);
+    var reducedHeroMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reducedHeroMotion) {
+      video.pause();
+      video.removeAttribute('autoplay');
+    } else {
+      var frameWatchStarted = false;
+      var revealVideo = function () {
+        if (video.classList.contains('azura-video-ready')) return;
+        requestAnimationFrame(function () { video.classList.add('azura-video-ready'); });
+      };
+      var waitForStableFrame = function () {
+        if (frameWatchStarted) return;
+        frameWatchStarted = true;
+        if (video.requestVideoFrameCallback) {
+          var decodedFrames = 0;
+          var onVideoFrame = function () {
+            decodedFrames += 1;
+            if (decodedFrames >= 2) revealVideo();
+            else video.requestVideoFrameCallback(onVideoFrame);
+          };
+          video.requestVideoFrameCallback(onVideoFrame);
+        } else {
+          requestAnimationFrame(function () { requestAnimationFrame(revealVideo); });
+        }
+      };
+      video.addEventListener('canplay', waitForStableFrame, { once: true });
+      if (video.readyState >= 3) waitForStableFrame();
+      video.muted = true;
+      var ensurePlayback = function () {
+        if (document.visibilityState !== 'visible') return;
+        var playback = video.play();
+        if (playback && playback.catch) playback.catch(function () {});
+      };
+      ensurePlayback();
+      document.addEventListener('visibilitychange', ensurePlayback);
+    }
   }
 
   var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -260,7 +301,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var raf = function (time) { lenis.raf(time); requestAnimationFrame(raf); };
     requestAnimationFrame(raf);
   }
-});
+}, { once: true, isRocket: true });
 </script>\n</head>`,
   );
   return output;
