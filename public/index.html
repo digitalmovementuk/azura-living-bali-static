@@ -445,10 +445,35 @@ html {
 html.azura-lenis-active {
   scroll-behavior: auto !important;
 }
+.azura-motion-ready .azura-reveal {
+  opacity: 0;
+  translate: 0 26px;
+  scale: .992;
+  transition: opacity .72s cubic-bezier(.22, 1, .36, 1), translate .78s cubic-bezier(.22, 1, .36, 1), scale .78s cubic-bezier(.22, 1, .36, 1);
+  transition-delay: var(--azura-reveal-delay, 0ms);
+  will-change: opacity, translate, scale;
+}
+.azura-motion-ready .azura-reveal.azura-reveal-left { translate: -24px 0; }
+.azura-motion-ready .azura-reveal.azura-reveal-right { translate: 24px 0; }
+.azura-motion-ready .azura-reveal.is-visible { opacity: 1; translate: 0 0; scale: 1; will-change: auto; }
+body.home.page-id-4371 a.elementor-button,
+body.home.page-id-4371 .elementor-button,
+body.home.page-id-4371 button:not(.menu-backdrop):not(.hamburger) { transition: transform .25s ease, box-shadow .25s ease, background-color .25s ease, color .25s ease; }
+@media (hover: hover) and (pointer: fine) {
+  body.home.page-id-4371 a.elementor-button:hover,
+  body.home.page-id-4371 .elementor-button:hover { transform: translateY(-2px); }
+  body.home.page-id-4371 .elementor-widget-image img { transition: scale .7s cubic-bezier(.22, 1, .36, 1); }
+  body.home.page-id-4371 .elementor-widget-image:hover img { scale: 1.012; }
+}
+body.home.page-id-4371 a.elementor-button:active,
+body.home.page-id-4371 .elementor-button:active { transform: scale(.985); }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .elementor-element-cf6720d .elementor-background-video-hosted { display: none; transition: none; }
   .azura-founder-sound { transition: none; }
+  .azura-motion-ready .azura-reveal,
+  .azura-motion-ready .azura-reveal.azura-reveal-left,
+  .azura-motion-ready .azura-reveal.azura-reveal-right { opacity: 1; translate: 0 0; scale: 1; transition: none; }
 }
 @media (max-width: 767px) {
   .elementor-4223 .elementor-element.elementor-element-8f851bb {
@@ -476,6 +501,9 @@ html.azura-lenis-active {
   .azura-founder-video-shell { width: min(100%, 390px); border-radius: 20px; }
   .azura-founder-video-kicker { display: none; }
   .azura-founder-sound { top: 72px; right: 12px; }
+  .azura-motion-ready .azura-reveal { translate: 0 20px; transition-duration: .62s, .68s, .68s; }
+  .azura-motion-ready .azura-reveal.azura-reveal-left,
+  .azura-motion-ready .azura-reveal.azura-reveal-right { translate: 0 20px; }
 }
 </style>
 <script defer src="/wp-content/cache/min/1/gh/studio-freight/lenis@0.2.28/bundled/lenis.js"></script>
@@ -590,6 +618,58 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var menuToggle = document.getElementById('menu-toggle');
+  var menuButton = document.querySelector('.menu-wrapper .hamburger');
+  var menuPopup = document.getElementById('azura-primary-menu');
+  var menuBackdrop = document.querySelector('[data-menu-close]');
+  if (menuToggle && menuButton && menuPopup) {
+    var firstMenuLink = menuPopup.querySelector('.menu-link');
+    var syncMenuState = function (moveFocus) {
+      var isOpen = menuToggle.checked;
+      menuButton.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      menuButton.setAttribute('aria-label', isOpen ? 'Close navigation menu' : 'Open navigation menu');
+      menuPopup.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+      document.documentElement.classList.toggle('azura-menu-open', isOpen);
+      if (isOpen && moveFocus && firstMenuLink) window.setTimeout(function () { firstMenuLink.focus({ preventScroll: true }); }, 180);
+    };
+    var closeMenu = function (returnFocus) {
+      menuToggle.checked = false;
+      syncMenuState(false);
+      if (returnFocus) menuButton.focus({ preventScroll: true });
+    };
+    menuButton.addEventListener('click', function (event) { event.preventDefault(); event.stopPropagation(); menuToggle.checked = !menuToggle.checked; syncMenuState(menuToggle.checked); }, { isRocket: true });
+    menuButton.addEventListener('keydown', function (event) {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      event.preventDefault(); event.stopPropagation(); menuToggle.checked = !menuToggle.checked; syncMenuState(menuToggle.checked);
+    }, { isRocket: true });
+    menuToggle.addEventListener('change', function () { syncMenuState(menuToggle.checked); }, { isRocket: true });
+    if (menuBackdrop) menuBackdrop.addEventListener('click', function (event) { event.preventDefault(); event.stopPropagation(); closeMenu(true); }, { isRocket: true });
+    document.addEventListener('keydown', function (event) { if (event.key === 'Escape' && menuToggle.checked) closeMenu(true); }, { isRocket: true });
+    menuPopup.querySelectorAll('.scroll-link').forEach(function (link) {
+      link.addEventListener('click', function (event) {
+        event.preventDefault(); event.stopImmediatePropagation();
+        var targetKey = link.getAttribute('data-target'); var targets = document.querySelectorAll('.scroll-target-' + targetKey); var target = null;
+        targets.forEach(function (candidate) { var style = window.getComputedStyle(candidate); if (style.display !== 'none' && candidate.getClientRects().length) target = candidate; });
+        closeMenu(false); if (!target) return;
+        window.requestAnimationFrame(function () {
+          if (window.azuraLenis && typeof window.azuraLenis.scrollTo === 'function') window.azuraLenis.scrollTo(target, { offset: -72, duration: 1.05 });
+          else window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY - 72, behavior: reducedMotion ? 'auto' : 'smooth' });
+        });
+      }, { isRocket: true });
+    });
+    menuPopup.querySelectorAll('.contact-button, .menu-whatsapp').forEach(function (link) { link.addEventListener('click', function (event) { event.stopPropagation(); }, { isRocket: true }); });
+    syncMenuState(false);
+  }
+  if (!reducedMotion && 'IntersectionObserver' in window) {
+    var revealSelector = ['.elementor-4371 .elementor-widget-heading','.elementor-4371 .elementor-widget-text-editor','.elementor-4371 .elementor-widget-image','.elementor-4371 .elementor-widget-icon-box','.elementor-4371 .elementor-widget-icon-list','.elementor-4371 .elementor-widget-counter','.elementor-4371 .elementor-widget-button','.elementor-4223 .elementor-widget-heading','.elementor-4223 .elementor-widget-text-editor','.elementor-4223 .elementor-widget-button','.azura-founder-video-shell'].join(',');
+    var revealNodes = Array.from(document.querySelectorAll(revealSelector)).filter(function (node) { return !node.closest('header') && !node.closest('.elementor-element-cf6720d') && !node.closest('.menu-popup') && node.getClientRects().length; });
+    revealNodes.forEach(function (node, index) { node.classList.add('azura-reveal'); if (node.matches('.elementor-widget-image, .azura-founder-video-shell')) node.classList.add(index % 2 ? 'azura-reveal-right' : 'azura-reveal-left'); node.style.setProperty('--azura-reveal-delay', String((index % 4) * 55) + 'ms'); });
+    var revealObserver = new IntersectionObserver(function (entries, observer) { entries.forEach(function (entry) { if (!entry.isIntersecting) return; entry.target.classList.add('is-visible'); observer.unobserve(entry.target); }); }, { threshold: .08, rootMargin: '0px 0px -7% 0px' });
+    revealNodes.forEach(function (node) { revealObserver.observe(node); });
+    document.documentElement.classList.add('azura-motion-ready');
+    window.requestAnimationFrame(function () { revealNodes.forEach(function (node) { if (node.getBoundingClientRect().top < window.innerHeight * .94) node.classList.add('is-visible'); }); });
+  }
+
   var finePointer = window.matchMedia('(pointer: fine)').matches;
   if (!reducedMotion && finePointer && window.Lenis) {
     var lenis = new Lenis({
@@ -788,24 +868,42 @@ document.addEventListener('DOMContentLoaded', function () {
 }
 </style>
 
+<style id="azura-premium-menu-css">
+html.azura-menu-open,html.azura-menu-open body{overflow:hidden!important;overscroll-behavior:none}
+.menu-wrapper .hamburger{top:max(16px,env(safe-area-inset-top))!important;left:clamp(16px,3vw,34px)!important;width:48px;height:48px;margin:0;padding:0;align-items:center;border:1px solid rgba(255,255,255,.3);border-radius:999px;background:rgba(10,13,11,.26);box-shadow:0 8px 28px rgba(0,0,0,.14);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);z-index:1000002}
+.menu-wrapper .hamburger:hover{background:rgba(10,13,11,.46)}.menu-wrapper .hamburger:focus-visible{outline:3px solid #d6aa14;outline-offset:4px}.menu-wrapper .hamburger div{width:23px;height:2px;margin:3px 0;border-radius:99px;background:#fff}
+#menu-toggle:checked+.hamburger{display:flex!important;visibility:visible!important;opacity:1!important;border-color:rgba(214,170,20,.52);background:rgba(21,24,21,.88)}#menu-toggle:checked+.hamburger div:nth-child(1){transform:rotate(45deg) translate(3px,3px)}#menu-toggle:checked+.hamburger div:nth-child(2){transform:rotate(-45deg) translate(3px,-3px)}
+.menu-wrapper .menu-popup{box-sizing:border-box;width:min(430px,100vw);height:100svh;min-height:100vh;padding:max(92px,calc(env(safe-area-inset-top) + 82px)) 32px max(28px,calc(env(safe-area-inset-bottom) + 22px));justify-content:flex-start;overflow-x:hidden;overflow-y:auto;background:radial-gradient(circle at 4% 2%,rgba(214,170,20,.16),transparent 35%),linear-gradient(155deg,#151914,#060807);border-right:1px solid rgba(255,255,255,.1);box-shadow:28px 0 70px rgba(0,0,0,.32);transform:translate3d(-104%,0,0);transition:transform .58s cubic-bezier(.22,1,.36,1);z-index:1000001}#menu-toggle:checked~.menu-popup{transform:translate3d(0,0,0)}
+.menu-panel-intro,.menu-wrapper .menu-link,.menu-contact-panel{opacity:0;transition:opacity .48s ease}#menu-toggle:checked~.menu-popup .menu-panel-intro,#menu-toggle:checked~.menu-popup .menu-link,#menu-toggle:checked~.menu-popup .menu-contact-panel{opacity:1}#menu-toggle:checked~.menu-popup .menu-panel-intro{transition-delay:.14s}#menu-toggle:checked~.menu-popup .menu-link:nth-child(1){transition-delay:.18s}#menu-toggle:checked~.menu-popup .menu-link:nth-child(2){transition-delay:.22s}#menu-toggle:checked~.menu-popup .menu-link:nth-child(3){transition-delay:.26s}#menu-toggle:checked~.menu-popup .menu-link:nth-child(4){transition-delay:.30s}#menu-toggle:checked~.menu-popup .menu-link:nth-child(5){transition-delay:.34s}#menu-toggle:checked~.menu-popup .menu-link:nth-child(6){transition-delay:.38s}#menu-toggle:checked~.menu-popup .menu-link:nth-child(7){transition-delay:.42s}#menu-toggle:checked~.menu-popup .menu-contact-panel{transition-delay:.46s}
+.menu-panel-intro{margin:0 0 20px}.menu-eyebrow{display:block;margin-bottom:8px;color:#d6aa14;font:600 11px/1.2 "Inter","Poppins",sans-serif;letter-spacing:.18em;text-transform:uppercase}.menu-panel-intro p{max-width:310px;margin:0;color:rgba(255,255,255,.67);font:400 14px/1.55 "Inter","Poppins",sans-serif}.menu-wrapper .menu-content{height:auto;padding:0;gap:0}
+.menu-wrapper .menu-link{display:grid;grid-template-columns:28px minmax(0,1fr) 18px;align-items:center;min-height:52px;padding:12px 0;color:#fff;border-bottom:1px solid rgba(255,255,255,.1);font:400 clamp(19px,2vw,22px)/1.2 "Inter","Poppins",sans-serif!important}.menu-wrapper .menu-link:hover,.menu-wrapper .menu-link:focus{color:#fff;transform:none}.menu-wrapper .menu-link:focus-visible{outline:2px solid #d6aa14;outline-offset:5px;border-radius:2px}.menu-index{color:#d6aa14;font:600 10px/1 "Inter",sans-serif;letter-spacing:.08em}.menu-link-label{transition:color .2s ease,translate .25s ease}.menu-link-arrow{width:16px;height:16px;opacity:.38;transition:opacity .2s ease,translate .25s ease}.menu-link:hover .menu-link-label,.menu-link:focus-visible .menu-link-label{color:#e2bd3c;translate:4px 0}.menu-link:hover .menu-link-arrow,.menu-link:focus-visible .menu-link-arrow{opacity:1;translate:3px 0}
+.menu-contact-panel{margin-top:auto;padding-top:28px;display:flex;flex-direction:column;align-items:stretch}.menu-contact-panel p{order:1;margin:0;color:rgba(255,255,255,.7);font:400 13px/1.5 "Inter","Poppins",sans-serif}.menu-wrapper .contact-button{order:2;box-sizing:border-box;width:100%!important;min-height:52px;margin:14px 0 0;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:14px;border-radius:999px;background:#d6aa14!important;color:#121510!important;box-shadow:0 14px 32px rgba(214,170,20,.18);font:600 14px/1 "Inter","Poppins",sans-serif!important;letter-spacing:.01em;transition:transform .25s ease,background-color .25s ease,box-shadow .25s ease}.menu-wrapper .contact-button:hover,.menu-wrapper .contact-button:focus{background:#e3bb32!important;color:#121510!important;transform:translateY(-2px);box-shadow:0 18px 38px rgba(214,170,20,.25)}.menu-wrapper .contact-button:focus-visible{outline:3px solid #fff;outline-offset:3px}.menu-wrapper .contact-button svg{width:18px;height:18px}.menu-whatsapp{order:3;display:inline-flex;margin-top:14px;color:rgba(255,255,255,.72)!important;font:500 12px/1.4 "Inter","Poppins",sans-serif;text-decoration:underline;text-decoration-color:rgba(214,170,20,.55);text-underline-offset:4px}.menu-whatsapp:hover,.menu-whatsapp:focus{color:#fff!important}
+.menu-backdrop{all:unset;position:fixed;inset:0;display:block;visibility:hidden;opacity:0;cursor:default;background:rgba(4,6,5,.58);-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);transition:opacity .38s ease,visibility 0s linear .38s;z-index:1000000}#menu-toggle:checked~.menu-backdrop{visibility:visible;opacity:1;transition-delay:0s}
+@media(max-width:767px){.menu-wrapper .menu-popup{width:100vw;padding-inline:24px;background:radial-gradient(circle at 4% 2%,rgba(214,170,20,.13),transparent 35%),linear-gradient(155deg,#151914,#060807)}.menu-panel-intro{text-align:center}.menu-panel-intro p{margin-inline:auto}.menu-wrapper .menu-link{font-size:clamp(20px,6vw,25px)!important}.menu-contact-panel{padding-top:18px;text-align:center}.menu-contact-panel p{display:none}.menu-wrapper .contact-button{width:min(100%,360px)!important;margin:0 auto}.menu-whatsapp{justify-content:center}}
+@media(max-width:767px) and (max-height:760px){.menu-wrapper .menu-popup{padding-top:max(76px,calc(env(safe-area-inset-top) + 68px));padding-bottom:16px}.menu-panel-intro{margin-bottom:8px}.menu-panel-intro p,.menu-contact-panel p{display:none}.menu-wrapper .menu-link{min-height:44px;padding-block:8px;font-size:19px!important}.menu-contact-panel{padding-top:14px}.menu-wrapper .contact-button{min-height:48px;margin-top:0}.menu-whatsapp{margin-top:10px}}
+@media(prefers-reduced-motion:reduce){.menu-wrapper .menu-popup,.menu-panel-intro,.menu-wrapper .menu-link,.menu-contact-panel,.menu-backdrop{transition-duration:.01ms!important;transition-delay:0s!important}}
+</style>
 <div class="menu-wrapper">
   <input aria-label="menu-toggle" type="checkbox" id="menu-toggle">
-  <label class="hamburger" for="menu-toggle" aria-label="Open navigation menu">
+  <label class="hamburger" for="menu-toggle" role="button" tabindex="0" aria-label="Open navigation menu" aria-controls="azura-primary-menu" aria-expanded="false">
     <div></div>
     <div></div>
   </label>
   
-  <nav class="menu-popup">
+  <nav id="azura-primary-menu" class="menu-popup" aria-label="Primary navigation" aria-hidden="true">
+    <div class="menu-panel-intro"><span class="menu-eyebrow">Azura Living Bali</span><p>Explore the villas, the vision and the opportunity.</p></div>
     <div class="menu-content">
-      <a class="scroll-link" href="#page-content" data-target="overview">Overview</a>
-      <a class="scroll-link" href="#page-content" data-target="design">Design</a>
-      <a class="scroll-link" href="#page-content" data-target="features">Features</a>
-      <a class="scroll-link" href="#page-content" data-target="calculator">Calculator</a>
-      <a class="scroll-link" href="#page-content" data-target="location">Location</a>
-      <a class="scroll-link" href="#page-content" data-target="payment">Payment</a>
+      <a class="scroll-link menu-link" href="#page-content" data-target="overview"><span class="menu-index">01</span><span class="menu-link-label">Overview</span><svg class="menu-link-arrow" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      <a class="scroll-link menu-link" href="#page-content" data-target="design"><span class="menu-index">02</span><span class="menu-link-label">Design</span><svg class="menu-link-arrow" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      <a class="scroll-link menu-link" href="#page-content" data-target="features"><span class="menu-index">03</span><span class="menu-link-label">Features</span><svg class="menu-link-arrow" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      <a class="scroll-link menu-link" href="#page-content" data-target="calculator"><span class="menu-index">04</span><span class="menu-link-label">Calculator</span><svg class="menu-link-arrow" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      <a class="scroll-link menu-link" href="#page-content" data-target="location"><span class="menu-index">05</span><span class="menu-link-label">Location</span><svg class="menu-link-arrow" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      <a class="scroll-link menu-link" href="#page-content" data-target="vision"><span class="menu-index">06</span><span class="menu-link-label">Founder Story</span><svg class="menu-link-arrow" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      <a class="scroll-link menu-link" href="#page-content" data-target="payment"><span class="menu-index">07</span><span class="menu-link-label">Payment</span><svg class="menu-link-arrow" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
     </div>
-    <a href="https://wa.me/6281241960867?text=" class="contact-button" target="_blank" rel="noopener noreferrer">Contact Us</a>
+    <div class="menu-contact-panel"><p>Questions about availability, ownership or a private viewing?</p><a href="https://api.leadconnectorhq.com/widget/bookings/azura-discovery-call" class="contact-button" target="_blank" rel="noopener noreferrer"><span>Contact Azura</span><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a><a href="https://wa.me/6281241960867?text=Hello%20Azura%20Living%20Bali%2C%20I%27d%20like%20to%20learn%20more." class="menu-whatsapp" target="_blank" rel="noopener noreferrer">Prefer WhatsApp? Message the team</a></div>
   </nav>
+  <button type="button" class="menu-backdrop" aria-label="Close navigation menu" data-menu-close></button>
 </div>
 
 <script type="rocketlazyloadscript">
