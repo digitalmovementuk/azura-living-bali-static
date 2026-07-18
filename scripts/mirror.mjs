@@ -24,6 +24,7 @@ const failures = [];
 let downloadedBytes = 0;
 
 const replacements = new Map([
+  ["6281241960867", "6282322846087"],
   [
     "/wp-content/uploads/2025/08/Azura-Hero-Sunset.mp4",
     "/assets/video/azura-hero-sunset-optimized.mp4",
@@ -317,7 +318,7 @@ const premiumMenuMarkup = `<nav id="azura-primary-menu" class="menu-popup" aria-
     <div class="menu-contact-panel">
       <p>Questions about availability, ownership or a private viewing?</p>
       <a href="https://api.leadconnectorhq.com/widget/bookings/azura-discovery-call" class="contact-button" target="_blank" rel="noopener noreferrer"><span>Contact Azura</span><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
-      <a href="https://wa.me/6281241960867?text=Hello%20Azura%20Living%20Bali%2C%20I%27d%20like%20to%20learn%20more." class="menu-whatsapp" target="_blank" rel="noopener noreferrer">Prefer WhatsApp? Message the team</a>
+      <a href="https://wa.me/6282322846087?text=Hello%20Azura%20Living%20Bali%2C%20I%27d%20like%20to%20learn%20more." class="menu-whatsapp" target="_blank" rel="noopener noreferrer">Prefer WhatsApp? Message the team</a>
     </div>
   </nav>
   <button type="button" class="menu-backdrop" aria-label="Close navigation menu" data-menu-close></button>`;
