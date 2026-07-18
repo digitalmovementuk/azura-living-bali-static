@@ -1,0 +1,24 @@
+{
+  "images": [
+    {
+      "src": "assets/images/tabanan-jatiluwih-rice-terraces.jpg",
+      "page": "https://azuralivingbali.com/",
+      "source": "https://unsplash.com/photos/green-rice-terraces-palm-trees-and-a-hazy-mountain-oR9jNPOKlU8",
+      "source_site": "unsplash",
+      "license": "Unsplash License",
+      "author": "Armand Mckenzie",
+      "role": "location-background",
+      "alt": "Jatiluwih rice terraces and palms beneath Mount Batukaru in Tabanan, Bali"
+    },
+    {
+      "src": "assets/images/early-bird-bali-villa-sunset.jpg",
+      "page": "https://azuralivingbali.com/",
+      "source": "https://www.pexels.com/photo/luxury-villa-pool-at-sunset-in-bali-indonesia-34790496/",
+      "source_site": "pexels",
+      "license": "Pexels License",
+      "author": "Kevin Yung",
+      "role": "cta-background",
+      "alt": "Luxury Bali villa infinity pool overlooking a tropical sunset"
+    }
+  ]
+}

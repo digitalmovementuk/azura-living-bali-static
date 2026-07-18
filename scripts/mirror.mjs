@@ -174,6 +174,36 @@ function cleanPage(text) {
 .elementor-element-cf6720d .elementor-background-video-hosted.azura-video-ready {
   opacity: 1;
 }
+/* Use direct local imagery so these sections never fall back to WordPress grey. */
+body.home.page-id-4371 .elementor-4371 .elementor-element.elementor-element-853059a:not(.elementor-motion-effects-element-type-background),
+body.home.page-id-4371 .elementor-4371 .elementor-element.elementor-element-853059a > .elementor-motion-effects-container > .elementor-motion-effects-layer,
+body.home.page-id-4371 .elementor-4371 .elementor-element.elementor-element-d86c731:not(.elementor-motion-effects-element-type-background),
+body.home.page-id-4371 .elementor-4371 .elementor-element.elementor-element-d86c731 > .elementor-motion-effects-container > .elementor-motion-effects-layer {
+  background-color: #233126 !important;
+  background-image: linear-gradient(180deg, rgba(8, 14, 10, .04) 32%, rgba(8, 14, 10, .72) 100%), url('/assets/images/tabanan-jatiluwih-rice-terraces.jpg') !important;
+  background-position: center 62% !important;
+  background-repeat: no-repeat !important;
+  background-size: cover !important;
+  background-attachment: scroll !important;
+}
+.elementor-4223 .elementor-element.elementor-element-8f851bb {
+  background-color: #080909 !important;
+  background-image: linear-gradient(180deg, rgba(5, 7, 7, .56), rgba(5, 7, 7, .78)), url('/assets/images/early-bird-bali-villa-sunset.jpg') !important;
+  background-position: center 58% !important;
+  background-repeat: no-repeat !important;
+  background-size: cover !important;
+  background-attachment: scroll !important;
+}
+.elementor-4223 .elementor-element.elementor-element-8f851bb::before {
+  display: none !important;
+}
+.elementor-4223 .elementor-element.elementor-element-8f851bb > .e-con-inner {
+  position: relative;
+  z-index: 1;
+}
+.elementor-4223 .elementor-element.elementor-element-58e207b {
+  display: none !important;
+}
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 72px;
@@ -184,6 +214,13 @@ html.azura-lenis-active {
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .elementor-element-cf6720d .elementor-background-video-hosted { transition: none; }
+}
+@media (max-width: 767px) {
+  .elementor-4223 .elementor-element.elementor-element-8f851bb {
+    --min-height: 56svh;
+    min-height: 56svh;
+    background-position: 58% center !important;
+  }
 }
 </style>
 <script defer src="/wp-content/cache/min/1/gh/studio-freight/lenis@0.2.28/bundled/lenis.js"></script>
