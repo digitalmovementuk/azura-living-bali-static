@@ -342,11 +342,16 @@ document.addEventListener('DOMContentLoaded', function () {
   var video = document.querySelector('[data-azura-hero-video]');
   if (video) {
     var revealVideo = function () { video.classList.add('azura-video-ready'); };
-    if (video.readyState >= 3) revealVideo();
-    else video.addEventListener('canplay', revealVideo, { once: true });
+    if (!video.paused && video.readyState >= 2) revealVideo();
+    video.addEventListener('playing', revealVideo, { once: true });
     video.muted = true;
-    var playback = video.play();
-    if (playback && playback.catch) playback.catch(function () {});
+    var ensurePlayback = function () {
+      if (document.visibilityState !== 'visible') return;
+      var playback = video.play();
+      if (playback && playback.catch) playback.catch(function () {});
+    };
+    ensurePlayback();
+    document.addEventListener('visibilitychange', ensurePlayback);
   }
 
   var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
