@@ -24,6 +24,14 @@ const failures = [];
 let downloadedBytes = 0;
 
 const replacements = new Map([
+  [
+    "/wp-content/uploads/2025/08/Azura-Hero-Sunset.mp4",
+    "/assets/video/azura-hero-sunset-optimized.mp4",
+  ],
+  [
+    "/wp-content/uploads\\/2025\\/08\\/Azura-Hero-Sunset.mp4",
+    "/assets/video\\/azura-hero-sunset-optimized.mp4",
+  ],
   ["https://azura-headless.netlify.app/maps", "/recovery/maps/"],
   ["https://azura-headless.netlify.app/silk", "/recovery/silk/"],
   ["https:\\/\\/azura-headless.netlify.app\\/maps", "/recovery/maps/"],
@@ -82,7 +90,37 @@ function cleanPage(text) {
   );
   output = output.replace(
     '<video class="elementor-background-video-hosted" role="presentation" autoplay muted playsinline loop></video>',
-    '<video class="elementor-background-video-hosted" data-azura-hero-video role="presentation" src="/wp-content/uploads/2025/08/Azura-Hero-Sunset.mp4" poster="/assets/images/azura-hero-poster.jpg" preload="metadata" autoplay muted playsinline loop></video>',
+    '<video class="elementor-background-video-hosted" data-azura-hero-video role="presentation" src="/assets/video/azura-hero-sunset-optimized.mp4" poster="/assets/images/azura-hero-poster.jpg" preload="metadata" autoplay muted playsinline loop></video>',
+  );
+  output = output.replace(
+    "elementor-element-b5272d9 e-con-full scroll-target-vision elementor-hidden-desktop elementor-hidden-tablet elementor-hidden-mobile e-flex",
+    "elementor-element-b5272d9 e-con-full scroll-target-vision e-flex",
+  );
+  output = output.replace(
+    '<h2 class="elementor-heading-title elementor-size-default">Vision</h2>',
+    '<h2 class="elementor-heading-title elementor-size-default">The Story Behind Azura</h2>',
+  );
+  output = output.replace(
+    /<img\b[^>]*class="attachment-full size-full wp-image-3070"[^>]*>\s*<noscript>[\s\S]*?<\/noscript>/i,
+    '<img width="1920" height="1280" src="/assets/images/azura-birds-eye-vision.jpg" class="attachment-full size-full wp-image-3070" alt="Aerial rendering of Azura Living Bali villas surrounded by rice fields near the coast" loading="lazy" decoding="async" />',
+  );
+  output = output.replace(
+    /<div class="elementor-element elementor-element-6203356[\s\S]*?(?=<div class="elementor-element elementor-element-edb8336)/i,
+    `<div class="elementor-element elementor-element-6203356 elementor-widget__width-inherit elementor-widget-mobile__width-inherit elementor-widget elementor-widget-html" data-id="6203356" data-element_type="widget" data-e-type="widget" data-widget_type="html.default">
+        <div class="elementor-widget-container">
+          <div class="azura-founder-video-shell" data-azura-founder-video-shell>
+            <video id="founder-story-video" class="azura-founder-video" data-azura-founder-video poster="/assets/images/ayham-founder-story-poster.jpg" preload="metadata" muted playsinline controls controlslist="nodownload" aria-label="Ayham Muhrez shares the story behind Azura Living Bali">
+              <source src="/assets/video/azura-founder-story.mp4" type="video/mp4">
+            </video>
+            <span class="azura-founder-video-kicker" aria-hidden="true">Founder story · 1:09</span>
+            <button class="azura-founder-sound" type="button" data-azura-founder-sound aria-pressed="false" aria-label="Play story with sound">
+              <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4Zm13.5 3a4.5 4.5 0 0 0-2.25-3.9v7.8A4.5 4.5 0 0 0 17.5 12Zm-2.25-7.84v2.08a6.5 6.5 0 0 1 0 11.52v2.08a8.5 8.5 0 0 0 0-15.68Z"/></svg>
+              <span>Play with sound</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      `,
   );
   output = output.replace(
     '<h2 class="elementor-heading-title elementor-size-default">Boutique Villas <br />  by Azura</h2>',
@@ -220,6 +258,86 @@ body.home.page-id-4371 .elementor-4371 .elementor-element.elementor-element-d86c
 .elementor-4223 .elementor-element.elementor-element-58e207b {
   display: none !important;
 }
+/* Restore the original founder vision section with authentic Azura media. */
+body.home.page-id-4371 .elementor-4371 .elementor-element.elementor-element-b5272d9 {
+  display: flex !important;
+  padding: clamp(56px, 7vw, 104px) clamp(20px, 5vw, 80px) !important;
+  background: #f3f3e9 !important;
+}
+body.home.page-id-4371 .elementor-4371 .elementor-element.elementor-element-b5272d9 > .elementor-element-5e204d1 {
+  width: min(100%, 1240px);
+  margin-inline: auto;
+  padding-bottom: 0 !important;
+}
+body.home.page-id-4371 .elementor-4371 .elementor-element.elementor-element-1379d06 {
+  min-height: clamp(360px, 44vw, 600px);
+  border-radius: 24px;
+  overflow: hidden;
+  background-color: #273329 !important;
+  background-image: linear-gradient(180deg, rgba(12, 18, 13, .02), rgba(12, 18, 13, .22)), url('/assets/images/azura-birds-eye-vision.jpg') !important;
+  background-position: center 54% !important;
+  background-repeat: no-repeat !important;
+  background-size: cover !important;
+}
+body.home.page-id-4371 .elementor-4371 .elementor-element.elementor-element-1379d06::before {
+  display: none !important;
+}
+body.home.page-id-4371 .elementor-4371 .elementor-element.elementor-element-6c57905 {
+  gap: clamp(32px, 5vw, 72px);
+  align-items: center;
+  padding-top: clamp(40px, 5vw, 72px);
+}
+.azura-founder-video-shell {
+  position: relative;
+  width: min(100%, 410px);
+  margin-inline: auto;
+  overflow: hidden;
+  border-radius: 24px;
+  background: #0a0c0b;
+  box-shadow: 0 24px 64px rgba(25, 30, 26, .2);
+  isolation: isolate;
+}
+.azura-founder-video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 480 / 852;
+  object-fit: cover;
+  background: #0a0c0b;
+}
+.azura-founder-video-kicker,
+.azura-founder-sound {
+  position: absolute;
+  z-index: 2;
+  top: 14px;
+  border: 1px solid rgba(255, 255, 255, .28);
+  background: rgba(12, 15, 13, .72);
+  color: #fff;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  font-family: "Inter", sans-serif;
+  font-size: 12px;
+  line-height: 1;
+}
+.azura-founder-video-kicker {
+  left: 14px;
+  padding: 10px 12px;
+  border-radius: 999px;
+  pointer-events: none;
+}
+.azura-founder-sound {
+  right: 14px;
+  min-height: 44px;
+  padding: 9px 13px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  transition: background-color .2s ease, transform .2s ease;
+}
+.azura-founder-sound:hover { background: rgba(12, 15, 13, .9); transform: translateY(-1px); }
+.azura-founder-sound:focus-visible { outline: 3px solid #d1a30a; outline-offset: 3px; }
+.azura-founder-sound svg { width: 17px; height: 17px; fill: currentColor; flex: 0 0 auto; }
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 72px;
@@ -230,6 +348,7 @@ html.azura-lenis-active {
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .elementor-element-cf6720d .elementor-background-video-hosted { display: none; transition: none; }
+  .azura-founder-sound { transition: none; }
 }
 @media (max-width: 767px) {
   .elementor-4223 .elementor-element.elementor-element-8f851bb {
@@ -237,6 +356,26 @@ html.azura-lenis-active {
     min-height: 56svh;
     background-position: 58% center !important;
   }
+  body.home.page-id-4371 .elementor-4371 .elementor-element.elementor-element-b5272d9 {
+    padding: 48px 20px 56px !important;
+  }
+  body.home.page-id-4371 .elementor-4371 .elementor-element.elementor-element-f99e5f6 {
+    text-align: center !important;
+  }
+  body.home.page-id-4371 .elementor-4371 .elementor-element.elementor-element-8fa3aa5 img {
+    width: 100% !important;
+    height: clamp(220px, 65vw, 300px) !important;
+    border-radius: 18px;
+    object-fit: cover;
+    object-position: center;
+  }
+  body.home.page-id-4371 .elementor-4371 .elementor-element.elementor-element-6c57905 {
+    gap: 32px;
+    padding-top: 36px;
+  }
+  .azura-founder-video-shell { width: min(100%, 390px); border-radius: 20px; }
+  .azura-founder-video-kicker { display: none; }
+  .azura-founder-sound { top: 72px; right: 12px; }
 }
 </style>
 <script defer src="/wp-content/cache/min/1/gh/studio-freight/lenis@0.2.28/bundled/lenis.js"></script>
@@ -279,6 +418,74 @@ document.addEventListener('DOMContentLoaded', function () {
       };
       ensurePlayback();
       document.addEventListener('visibilitychange', ensurePlayback);
+    }
+  }
+
+  var founderVideo = document.querySelector('[data-azura-founder-video]');
+  var founderSound = document.querySelector('[data-azura-founder-sound]');
+  if (founderVideo) {
+    var reducedFounderMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    founderVideo.muted = true;
+    founderVideo.defaultMuted = true;
+    founderVideo.playsInline = true;
+
+    var setFounderSoundLabel = function () {
+      if (!founderSound) return;
+      var label = founderVideo.muted ? (reducedFounderMotion ? 'Play with sound' : 'Turn sound on') : 'Turn sound off';
+      founderSound.querySelector('span').textContent = label;
+      founderSound.setAttribute('aria-label', label);
+      founderSound.setAttribute('aria-pressed', founderVideo.muted ? 'false' : 'true');
+    };
+
+    if (!reducedFounderMotion) {
+      var updateFounderPlayback = function () {
+        var rect = founderVideo.getBoundingClientRect();
+        var nearViewport = rect.top < window.innerHeight + 220 && rect.bottom > -220;
+        if (nearViewport && founderVideo.paused && !founderVideo.ended) {
+          var playback = founderVideo.play();
+          if (playback && playback.catch) playback.catch(function () {});
+        }
+      };
+      if ('IntersectionObserver' in window) {
+        var founderObserver = new IntersectionObserver(updateFounderPlayback, { rootMargin: '220px 0px', threshold: 0.01 });
+        founderObserver.observe(founderVideo);
+      }
+      var founderFramePending = false;
+      var queueFounderPlaybackCheck = function () {
+        if (founderFramePending) return;
+        founderFramePending = true;
+        requestAnimationFrame(function () {
+          founderFramePending = false;
+          updateFounderPlayback();
+        });
+      };
+      window.addEventListener('scroll', queueFounderPlaybackCheck, { passive: true });
+      window.addEventListener('resize', queueFounderPlaybackCheck, { passive: true });
+      requestAnimationFrame(updateFounderPlayback);
+    }
+
+    if (founderSound) {
+      founderSound.addEventListener('click', function (event) {
+        event.stopPropagation();
+        if (founderVideo.ended) founderVideo.currentTime = 0;
+        if (founderVideo.muted) {
+          founderVideo.removeAttribute('muted');
+          founderVideo.defaultMuted = false;
+          founderVideo.muted = false;
+          founderVideo.volume = 1;
+        } else {
+          founderVideo.muted = true;
+        }
+        if (!founderVideo.paused && founderVideo.muted) {
+          setFounderSoundLabel();
+          return;
+        }
+        var playback = founderVideo.play();
+        if (playback && playback.catch) playback.catch(function () {});
+        setFounderSoundLabel();
+      }, { isRocket: true });
+      founderVideo.addEventListener('volumechange', setFounderSoundLabel);
+      setFounderSoundLabel();
     }
   }
 
