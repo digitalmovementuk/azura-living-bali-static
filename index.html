@@ -659,14 +659,14 @@ document.addEventListener('DOMContentLoaded', function () {
   var finePointer = window.matchMedia('(pointer: fine)').matches;
   if (!reducedMotion && finePointer && window.Lenis) {
     var lenis = new Lenis({
-      duration: 0.95,
+      duration: 0.6,
       easing: function (t) { return Math.min(1, 1.001 - Math.pow(2, -10 * t)); },
       direction: 'vertical',
       gestureDirection: 'vertical',
       smooth: true,
       smoothTouch: false,
-      mouseMultiplier: 0.9,
-      touchMultiplier: 1.5,
+      mouseMultiplier: 1.9,
+      touchMultiplier: 2,
       infinite: false
     });
     document.documentElement.classList.add('azura-lenis-active');
