@@ -24,7 +24,7 @@ const failures = [];
 let downloadedBytes = 0;
 
 const poweredByDigitalMovement =
-  "<div class=\"dm-powered-by\" style=\"margin-top:16px;display:flex;align-items:center;gap:9px;flex-wrap:wrap;\"><span style=\"font-size:12px;letter-spacing:.08em;text-transform:uppercase;opacity:.65;\">Powered by</span><a href=\"https://digitalmovement.uk/\" target=\"_blank\" rel=\"noopener\" title=\"Website by Digital Movement\" style=\"display:inline-flex;align-items:center;line-height:0;\"><img src=\"/assets/images/digital-movement-logo.svg\" alt=\"Digital Movement\" width=\"150\" height=\"32\" style=\"height:22px;width:auto;display:block;\"></a></div>";
+  "<div class=\"dm-powered-by\" style=\"margin-top:16px;display:flex;align-items:center;justify-content:center;gap:9px;flex-wrap:wrap;\"><span style=\"font-size:12px;letter-spacing:.08em;text-transform:uppercase;opacity:.65;\">Powered by</span><a href=\"https://digitalmovement.uk/\" target=\"_blank\" rel=\"noopener\" title=\"Website by Digital Movement\" style=\"display:inline-flex;align-items:center;line-height:0;\"><img src=\"/assets/images/digital-movement-logo.svg\" alt=\"Digital Movement\" width=\"150\" height=\"32\" style=\"height:22px;width:auto;display:block;\"></a></div>";
 
 const replacements = new Map([
   ["6281241960867", "6282322846087"],
