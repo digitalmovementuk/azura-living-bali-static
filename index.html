@@ -677,6 +677,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 }, { once: true, isRocket: true });
 </script>
+<link rel="stylesheet" id="azura-invest-css" href="/assets/css/azura-invest.css?v=f502fe5c">
 </head>
 
 <body class="home wp-singular page-template page-template-elementor_header_footer page page-id-4371 page-child parent-pageid-3131 wp-custom-logo wp-embed-responsive wp-theme-generatepress right-sidebar nav-float-right separate-containers header-aligned-left dropdown-hover elementor-default elementor-template-full-width elementor-kit-8 elementor-page elementor-page-4371 full-width-content" itemtype="https://schema.org/WebPage" itemscope>
@@ -2695,7 +2696,7 @@ WE ARE ONLINE
 				</div>
 				</div>
 				</div>
-		<div class="elementor-element elementor-element-49a1d52 e-con-full scroll-target-calculator e-flex e-con e-child" data-id="49a1d52" data-element_type="container" data-e-type="container" id="annual-ROI">
+		<div id="calculator"></div><div class="elementor-element elementor-element-49a1d52 e-con-full scroll-target-calculator e-flex e-con e-child" data-id="49a1d52" data-element_type="container" data-e-type="container" id="annual-ROI">
 				<div class="elementor-element elementor-element-108d331 elementor-widget elementor-widget-html" data-id="108d331" data-element_type="widget" data-e-type="widget" data-widget_type="html.default">
 				<div class="elementor-widget-container">
 					<!DOCTYPE html>
@@ -4094,103 +4095,34 @@ I’m interested in hearing more about the villas and the investment process.`;
 				</div>
 		
 	
-<style id="azura-invest-css">
-.azura-invest{background:#FDF9EE;color:#2E2E2E;padding:96px 24px;
-  font-family:"Inter","Inter Tight",system-ui,sans-serif;
-  -webkit-hyphens:auto;hyphens:auto}
-.azura-invest-inner{max-width:760px;margin:0 auto}
-.azura-invest-eyebrow{display:block;font-size:.75rem;letter-spacing:.22em;
-  text-transform:uppercase;color:#CFB010;margin:0 0 18px;font-weight:600}
-.azura-invest h2{font-family:"The Seasons","Lora",Georgia,serif;font-weight:400;
-  font-size:clamp(1.6rem,3.4vw,2.3rem);line-height:1.22;color:#2E2E2E;
-  margin:56px 0 18px;letter-spacing:-.01em}
-.azura-invest h2:first-of-type{margin-top:0}
-.azura-invest h3{font-family:"Inter",system-ui,sans-serif;font-weight:600;
-  font-size:1.0625rem;letter-spacing:.01em;color:#2E2E2E;margin:32px 0 12px}
-.azura-invest p{font-size:1.0625rem;line-height:1.72;margin:0 0 20px;color:#3A3A3A}
-.azura-invest a{color:#2E2E2E;text-decoration:underline;text-underline-offset:3px;
-  text-decoration-color:#CFB010;text-decoration-thickness:2px}
-.azura-invest a:hover{color:#000}
-.azura-invest-figure{margin:48px 0}
-.azura-invest-figure img{width:100%;height:auto;display:block;border-radius:2px}
-.azura-invest-figure figcaption{font-size:.8125rem;color:#7A7466;margin-top:10px}
-.azura-invest strong{font-weight:600;color:#2E2E2E}
-.azura-invest-close{margin-top:56px;padding-top:28px;border-top:1px solid #E6E1D8;
-  font-size:1.0625rem;color:#2E2E2E}
-.azura-invest-note{font-size:.875rem;line-height:1.6;color:#7A7466;margin-top:32px}
-/* Everything past the ownership answer is a disclosure row. The words are
-   still in the page for a reader and for a crawler, but the section is about
-   1,200px tall instead of 9,700px, so the home page scrolls like a home page
-   again. Each row is one question, which is how visitors read this material
-   anyway. */
-.azura-invest-q{border-top:1px solid #E6E1D8}
-/* No bottom rule on the last row: the closing line below draws its own, and
-   two hairlines 20px apart read as a mistake. */
-.azura-invest-q:last-of-type{border-bottom:0}
-.azura-invest-q + .azura-invest-close{margin-top:0}
-.azura-invest-q>summary{list-style:none;cursor:pointer;padding:22px 48px 22px 0;
-  position:relative}
-.azura-invest-q>summary::-webkit-details-marker{display:none}
-.azura-invest-q>summary::after{content:"";position:absolute;right:10px;top:50%;
-  width:9px;height:9px;margin-top:-8px;border-right:2px solid #CFB010;
-  border-bottom:2px solid #CFB010;transform:rotate(45deg);
-  transition:transform .18s ease}
-.azura-invest-q[open]>summary::after{transform:rotate(-135deg);margin-top:-3px}
-.azura-invest-q>summary h2{font-size:clamp(1.0625rem,1.9vw,1.3125rem);margin:0;
-  line-height:1.35;display:inline-block;vertical-align:middle}
-.azura-invest-q>summary:hover h2{color:#000}
-.azura-invest-q-body{padding:0 0 14px}
-.azura-invest-q-body>*:first-child{margin-top:0}
-.azura-invest-q-body p:last-child{margin-bottom:0}
-.azura-invest-q-body .azura-invest-figure{margin:28px 0 8px}
-/* The hero. The eyebrow carries the keyphrase above the client's own display
-   line, so both survive; it must never run into it. Colours are inherited
-   from the hero widget, because the hero sits on video and its text is white. */
-.azura-invest-h1-eyebrow{display:block;font-family:"Inter","Inter Tight",system-ui,sans-serif;
-  font-size:clamp(.7rem,1vw,.8125rem);letter-spacing:.22em;text-transform:uppercase;
-  font-weight:600;color:#E8C84B;line-height:1.35;margin:0 0 20px}
-.azura-invest-h1-main{display:block}
-.azura-invest-hero-lede{color:inherit;font-size:clamp(1rem,1.3vw,1.1875rem);
-  line-height:1.55;margin:0 0 10px;max-width:46ch}
-.azura-invest-hero-sub{color:inherit;margin:0;opacity:.85}
-/* Semantics only: this heading must look exactly like the text widget it
-   replaced, so every inherited heading style is reset. */
-.azura-invest-h2v{font:inherit;color:inherit;letter-spacing:inherit;
-  line-height:inherit;text-transform:inherit;margin:0;padding:0;display:inline}
-@media (max-width:768px){
-  .azura-invest{padding:64px 20px}
-  .azura-invest h2{margin:44px 0 14px}
-  .azura-invest p{font-size:1rem;line-height:1.7}
-}
-</style>
 <section class="azura-invest" id="bali-property-investment" aria-labelledby="azura-invest-title">
   <div class="azura-invest-inner">
     <span class="azura-invest-eyebrow">Ownership, plainly explained</span>
     <h2 id="azura-invest-title">Bali Property Investment: The Legal Position for Foreign Buyers</h2>
 <p>Every Bali property investment begins with the same question: can a foreigner legally own a villa here? The short answer is yes, through three routes written into Indonesian law. But the detail matters. So we set it out in full below, with no gloss and no sales talk.</p>
 <p>Take five minutes on this before you request the brochure. Because once you understand how ownership works, every other part of a Bali property investment gets simpler. Nothing here is legal advice, but it is the honest map. The villa, the numbers and the timing all rest on this legal base.</p>
-<h2>Can a Foreigner Actually Buy Property in Bali?</h2>
+<h2 id="can-a-foreigner-actually-buy-property-in-bali">Can a Foreigner Actually Buy Property in Bali?</h2>
 <p>Yes, but not the way you would buy at home. Indonesian law reserves freehold title, called <strong>Hak Milik</strong>, for Indonesian citizens only. No foreigner can hold it, whatever a listing may imply. That one fact sits underneath every honest Bali property investment, so we start there. Knowing it early saves you weeks of confusion later.</p>
 <p>However, the same law gives you three protected ways to hold a villa. Each appears in Indonesian statute, and thousands of foreign buyers already use them, from Canggu to Uluwatu. In other words, buying here is legal, normal and well trodden. Which route fits you depends on your residency and on what the villa will do for you.</p>
 <figure class="azura-invest-figure"><img src="/wp-content/uploads/2025/07/2-fasad-malam-2.webp" alt="Modern villa exterior at night at Azura Living, a Bali property investment in Tabanan" width="1200" height="800" loading="lazy" decoding="async"><figcaption>A four-bedroom villa at dusk. Twelve are being built; ten are still available.</figcaption></figure>
-<h2>Leasehold, Right to Use, or a Company: Your Three Routes</h2>
+<h2 id="leasehold-right-to-use-or-a-company-your-three-routes">Leasehold, Right to Use, or a Company: Your Three Routes</h2>
 <p>The most common route is leasehold, known as <strong>Hak Sewa</strong> (a right to lease). It is a private contract with the landowner, typically 25 to 30 years, with extensions agreed up front. Leasehold needs no residence permit, which is why most foreign buyers use it. So when a project quotes a title of up to 80 years, read it as an initial term plus extensions fixed in your contract. That is what the number means here too.</p>
 <p>The second route is <strong>Hak Pakai</strong> (Right to Use), a title you hold in your own name. It gives you 30 years, extends by 20, then renews by 30. But it needs a valid Indonesian residence permit, a KITAS or KITAP. The third route is a <strong>PT PMA</strong> (a foreign-owned Indonesian company). Our <a href="/bali-property-investment/">full guide to how foreign ownership works</a> works through all three in detail. Your company then holds <strong>Hak Guna Bangunan</strong> (Right to Build) on the same 30, 20, 30 pattern. For example, buyers who plan to rent the villa out as a business usually choose this one.</p>
-<details class="azura-invest-q">
+<details class="azura-invest-q" id="the-nominee-shortcut-is-not-one-of-them">
 <summary><h2>The Nominee Shortcut Is Not One of Them</h2></summary>
 <div class="azura-invest-q-body">
 <p>You will also hear about a fourth option: putting the title in an Indonesian person's name. Do not take it. Indonesian courts have voided these nominee deals, and the foreign buyer has no legal protection at all. On paper, the nominee owns your villa. In practice, they can keep it. The saving is never worth the risk.</p>
 <p>A sound Bali property investment never rests on someone else's name. So every structure offered at Azura Living is one the law recognises and a court will uphold. That said, take independent legal advice before you sign anything. Good lawyers in Bali quote fixed fees, and a review takes days, not months. A serious seller will encourage it, and we do.</p>
 </div>
 </details>
-<details class="azura-invest-q">
+<details class="azura-invest-q" id="how-a-notary-protects-your-bali-property-investment">
 <summary><h2>How a Notary Protects Your Bali Property Investment</h2></summary>
 <div class="azura-invest-q-body">
 <p>Every purchase in Indonesia completes in front of a <strong>notaris/PPAT</strong> (a licensed land deed official). The notary checks the title, the seller and the permits before any money moves. It also goes on the public record, so your rights outlive a handshake. Therefore you never rely on a seller's word alone. That check protects you better than any brochure ever could.</p>
 <figure class="azura-invest-figure"><img src="/assets/images/tabanan-jatiluwih-rice-terraces.jpg" alt="Jatiluwih rice terraces in Tabanan, the setting for this Bali property investment" width="1200" height="800" loading="lazy" decoding="async"><figcaption>The Jatiluwih rice terraces in Tabanan, the regency where Azura Living is building.</figcaption></figure>
 </div>
 </details>
-<details class="azura-invest-q">
+<details class="azura-invest-q" id="what-a-bali-property-investment-buys-you">
 <summary><h2>What a Bali Property Investment Buys You</h2></summary>
 <div class="azura-invest-q-body">
 <p>A Bali property investment here buys a whole home, rather than a promise on paper. Each villa gives you 318 square metres of living space, while the land beneath runs to 400 square metres or more. Inside sit four bedrooms and four and a half bathrooms.</p>
@@ -4199,7 +4131,7 @@ I’m interested in hearing more about the villas and the investment process.`;
 <p>Once the keys change hands, a professional team runs the villa for you. The team handles bookings, cleaning and repairs, while guards watch the site day and night. Each month, you also receive a clear statement of income and costs. In short, you own the asset and someone else does the daily work.</p>
 </div>
 </details>
-<details class="azura-invest-q">
+<details class="azura-invest-q" id="why-tabanan-beats-canggu-for-bali-property-buyers">
 <summary><h2>Why Tabanan Beats Canggu for Bali Property Buyers</h2></summary>
 <div class="azura-invest-q-body">
 <p>Canggu and Seminyak grew first, so their land prices climbed years ago. Tabanan, however, still costs far less per square metre of land. Because plots cost less, your money buys more house and more garden. In Canggu, for example, the same budget buys a smaller villa beside a busier lane.</p>
@@ -4207,7 +4139,7 @@ I’m interested in hearing more about the villas and the investment process.`;
 <p>Tabanan is still early, which means you buy before the crowd arrives. That timing, in fact, drives this Bali property investment case. Early rarely feels comfortable, but early is where the value tends to sit.</p>
 </div>
 </details>
-<details class="azura-invest-q">
+<details class="azura-invest-q" id="daily-life-around-a-bali-property-investment">
 <summary><h2>Daily Life Around a Bali Property Investment</h2></summary>
 <div class="azura-invest-q-body">
 <p>A week in Tabanan starts slowly, because the west side of Bali keeps its own pace. Surfers head out early, while the black-sand beaches at Kedungu and Balian sit almost empty on a weekday. Then breakfast means a warung table, with fried rice and strong coffee for a dollar or two. Nobody performs for tourists here; in fact, most mornings you hear more roosters than scooters.</p>
@@ -4216,7 +4148,7 @@ I’m interested in hearing more about the villas and the investment process.`;
 <figure class="azura-invest-figure"><img src="/wp-content/uploads/2025/07/Outdoor-view-sunken-sauna-plunge-pool.jpg" alt="Garden with sunken sauna and plunge pool at a Bali property investment villa in Tabanan" width="1200" height="800" loading="lazy" decoding="async"><figcaption>The garden, sunken sauna and plunge pool that come with every villa.</figcaption></figure>
 </div>
 </details>
-<details class="azura-invest-q">
+<details class="azura-invest-q" id="how-the-staged-payments-protect-you">
 <summary><h2>How the Staged Payments Protect You</h2></summary>
 <div class="azura-invest-q-body">
 <p>You never pay everything at once, because the price splits into six stages. First, 5 per cent reserves your villa. Then 25 per cent follows when building starts on your plot. After that, 30 per cent falls due once the structure stands.</p>
@@ -4224,7 +4156,7 @@ I’m interested in hearing more about the villas and the investment process.`;
 <p>Ultimate Horizons Property, the seller of record, collects each stage only after the work exists. You owe nothing further until the builders reach the next milestone. So the schedule, not the sales calendar, decides when money moves.</p>
 </div>
 </details>
-<details class="azura-invest-q">
+<details class="azura-invest-q" id="the-people-behind-this-bali-property-investment">
 <summary><h2>The People Behind This Bali Property Investment</h2></summary>
 <div class="azura-invest-q-body">
 <p>First, meet Ayham Muhrez, the civil engineer who leads the build on the ground. He spent more than twenty years running construction projects before he moved into Bali villas. That background shapes the daily decisions on site, rather than the marketing calendar. In practice, he walks the site most days and signs off the structural work himself, stage by stage.</p>
@@ -4236,7 +4168,7 @@ I’m interested in hearing more about the villas and the investment process.`;
 <p>Finally, you or your representative inspect the finished villa room by room. Snagging items land on a single list; accordingly, the team must clear every line. You keep copies of every report, of course, from the earliest pour to the final paint. Hence the file you hand to your lawyer tells the whole story.</p>
 </div>
 </details>
-<details class="azura-invest-q">
+<details class="azura-invest-q" id="reading-the-roi-calculator-on-a-bali-investment">
 <summary><h2>Reading the ROI Calculator on a Bali Investment</h2></summary>
 <div class="azura-invest-q-body">
 <p>The <a href="#calculator">calculator on this page</a> uses two Tabanan benchmarks: 70 per cent occupancy and 7 per cent yearly capital growth. However, those figures describe the area, not any single Bali property investment. Treat them as a starting point rather than a forecast.</p>
@@ -4245,7 +4177,7 @@ I’m interested in hearing more about the villas and the investment process.`;
 <p>The 6 to 12 year payback range is an estimate, because real results depend on those inputs. A sound Bali property investment, though, survives cautious maths. If the case only works when everything goes right, then it is not a case.</p>
 </div>
 </details>
-<details class="azura-invest-q">
+<details class="azura-invest-q" id="the-real-risks-of-a-bali-property-investment">
 <summary><h2>The Real Risks of a Bali Property Investment</h2></summary>
 <div class="azura-invest-q-body">
 <p>Every Bali property investment carries risk, so we name ours plainly. First, the villa does not exist yet, and off-plan buying always carries completion risk. The staged payments limit that exposure, although they cannot remove it.</p>
@@ -4253,7 +4185,7 @@ I’m interested in hearing more about the villas and the investment process.`;
 <p>Finally, Indonesian rules for foreign buyers can change over time. No seller controls that, of course, and we will not pretend otherwise. A risk named out loud, however, is a risk you can price.</p>
 </div>
 </details>
-<details class="azura-invest-q">
+<details class="azura-invest-q" id="who-this-suits-and-who-it-does-not">
 <summary><h2>Who This Suits, and Who It Does Not</h2></summary>
 <div class="azura-invest-q-body">
 <p>This suits you if you want a managed asset while you live elsewhere. It also fits buyers who can wait, since handover arrives in early 2027. Patience, in fact, is the main entry requirement. A Bali property investment of this kind, above all, rewards owners who think in years.</p>
@@ -4261,7 +4193,7 @@ I’m interested in hearing more about the villas and the investment process.`;
 <p>One question sits behind all of this: how you will legally own the villa. We answer that above, while our <a href="/bali-property-investment/">longer ownership guide</a> goes further still. Then the brochure covers the plans, the prices and the dates.</p>
 </div>
 </details>
-<details class="azura-invest-q">
+<details class="azura-invest-q" id="what-happens-after-you-request-the-brochure">
 <summary><h2>What Happens After You Request the Brochure</h2></summary>
 <div class="azura-invest-q-body">
 <p>First, the brochure arrives by email, usually within a day of your request. Nobody rings you the moment you open it; instead, you book a call whenever you feel ready. In fact, the call follows your questions rather than a sales script. Second, you decide in your own time whether the numbers deserve a closer look.</p>
@@ -4270,9 +4202,31 @@ I’m interested in hearing more about the villas and the investment process.`;
 </div>
 </details>
     <p class="azura-invest-close"><strong>Request the brochure below, then decide with the full plans in hand.</strong></p>
+    <div class="azura-invest-actions">
+      <a class="azura-invest-btn azura-invest-btn-primary" href="https://wa.me/6282322846087?text=Hi%2C%20could%20you%20please%20share%20the%20Azura%20brochure%20with%20me%3F" target="_blank" rel="noopener">Download Brochure</a>
+      <a class="azura-invest-btn azura-invest-btn-secondary" href="https://api.leadconnectorhq.com/widget/bookings/azura-discovery-call" target="_blank" rel="noopener">Book Discovery Call</a>
+    </div>
     <p class="azura-invest-note">This page explains how foreign ownership works in Indonesia in general terms. It is not legal advice. Take independent advice from an Indonesian lawyer and a notaris/PPAT before you sign or transfer any money.</p>
   </div>
 </section>
+<script>
+(function () {
+  function reveal() {
+    var id = decodeURIComponent(location.hash.slice(1));
+    if (!id) return;
+    var el = document.getElementById(id);
+    if (!el) return;
+    var row = el.closest ? el.closest('details') : null;
+    if (!row || row.open) return;
+    row.open = true;
+    requestAnimationFrame(function () { row.scrollIntoView(); });
+  }
+  window.addEventListener('hashchange', reveal);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', reveal, { once: true });
+  } else reveal();
+})();
+</script>
 </main>
 </div>
 
