@@ -1151,6 +1151,11 @@ await bundleHeadStyles(path.join(publicRoot, "early-bird", "index.html"), "site-
 await inlineBodyStyles(path.join(publicRoot, "index.html"));
 await inlineBodyStyles(path.join(publicRoot, "early-bird", "index.html"));
 
+// The mirror rebuilds index.html from the live page, which would wipe every
+// on-page SEO edit. Re-apply them here so a re-mirror never silently
+// un-optimises the page. seo-patch.mjs is idempotent.
+await import("./seo-patch.mjs");
+
 const report = {
   source: origin.href,
   generatedAt: new Date().toISOString(),
