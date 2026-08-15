@@ -106,6 +106,49 @@ note rendering at body size in body colour. Every rule for a paragraph or a
 link in `invest-css.mjs` therefore names its element — `p.azura-invest-note`,
 `a.azura-invest-btn`. Confirm by reading the computed style, not the source.
 
+**The word "freehold".** No foreigner can hold Indonesian freehold — Hak Milik
+is reserved for Indonesian citizens — and the section we added says so plainly.
+The client's older copy called the same villas freehold in five places, so the
+page contradicted itself. `seo-patch.mjs` replaces the legal word and leaves
+every figure alone: the lease still runs 80 years, the model still shows 18%.
+"ROI up to 18% p.a." became "Projected ROI up to 18% p.a." for the same reason.
+`--check` cuts our own section out of the page first, then fails if the word
+survives anywhere in the client copy — inside our section it is correct and
+frequent. Copy written by Fable 5.
+
+Two of those five sat in a container that is `display:none` at every width, so
+no visitor ever read them. They were changed anyway: a crawler reads hidden
+text, and a page that argues with itself in its own markup is still a page that
+argues with itself.
+
+**The ROI calculator was a whole second HTML document.** It had been pasted
+into an Elementor HTML widget complete with its own `<!DOCTYPE>`, `<html>`,
+`<head>`, `<title>` and `<body>`, in the middle of the page. Three things
+followed from that, and all three are now fixed by `seo-patch.mjs`:
+
+- The page carried **two `<title>` elements**.
+- The stray `</body></html>` sat thousands of lines above the real one, so
+  `build-guide.mjs` sliced the site's scripts backwards and came out with
+  nothing. **The guide page had been shipping with no JavaScript at all** —
+  no smooth scroll, no menu behaviour. Removing the tag restored 43KB of it.
+  The seven Elementor popup templates in the same region are dropped from the
+  guide on purpose: they never open there, and each embeds a LeadConnector
+  iframe, so keeping them would call a third party on load for nothing.
+- Its Tailwind build came from **jsdelivr at run time**, on a WP Rocket
+  "load once the visitor interacts" tag. Every style in the calculator is a
+  Tailwind utility class, so until someone moved a mouse it rendered unstyled:
+  no dark panel, no rounded corners, sliders at full page width. Tailwind is
+  now served from this site and loads itself when the calculator comes within
+  600px of the screen. `--check` fails on a live jsdelivr script, on a second
+  `<title>`, `<!DOCTYPE>` or `</body>`, and on a missing or truncated build.
+
+**`sub()` decides it has already run by looking for its own output.** That is
+fine for a title or a heading and wrong for anything ordinary: every page
+contains the empty string and every page contains `</div>`, so `sub()` reads
+itself as done and silently changes nothing. Deletions and structural edits go
+through `rewrite()`, which has no such shortcut. Patching always starts from
+the pristine page, so a missing needle there is a real failure.
+
 **Image alt text.** The photographs describe what they show and where it is.
 The icons keep `alt=""` on purpose: each one sits beside its own text label,
 so a screen reader that announced them would only repeat itself.

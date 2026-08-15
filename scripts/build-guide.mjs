@@ -146,7 +146,38 @@ if (footerEnd < 0) throw new Error('build-guide: cannot find end of site footer'
 let footer = src.slice(footerStart, footerEnd).replace(/href="#(?!")/g, 'href="/#');
 
 // Everything from the end of the footer to </body>: the site's scripts.
-const scripts = src.slice(footerEnd, src.indexOf('</body>'));
+//
+// This used to come out empty by accident. The ROI calculator was pasted into
+// the home page as a whole second HTML document, so the first </body> in the
+// file was the calculator's, thousands of lines above the footer — and this
+// slice ran backwards and yielded nothing. The guide page has therefore been
+// shipping without any of the site's JavaScript. Removing that stray tag fixed
+// the slice, which is why the guide suddenly gained 68KB.
+//
+// The seven Elementor popup templates that sit in the same region are dropped.
+// They never open on this page, and each one embeds a LeadConnector iframe, so
+// keeping them would have the guide calling a third party on load for nothing.
+let scripts = src.slice(footerEnd, src.indexOf('</body>'));
+if (scripts.length < 1000) throw new Error('build-guide: site scripts came out empty');
+const popupCount = (scripts.match(/data-elementor-type="popup"/g) || []).length;
+for (let i = 0; i < popupCount; i += 1) {
+  const start = scripts.search(/<div data-elementor-type="popup"/);
+  if (start < 0) break;
+  let depth = 0;
+  let end = -1;
+  for (const m of scripts.slice(start).matchAll(/<div\b[^>]*>|<\/div>/g)) {
+    if (m[0].startsWith('</')) {
+      depth -= 1;
+      if (depth === 0) { end = start + m.index + m[0].length; break; }
+    } else depth += 1;
+  }
+  if (end < 0) throw new Error('build-guide: cannot find end of a popup template');
+  scripts = scripts.slice(0, start) + scripts.slice(end);
+}
+const popupsLeft = (scripts.match(/data-elementor-type="popup"/g) || []).length;
+if (popupsLeft) {
+  throw new Error(`build-guide: ${popupsLeft} of ${popupCount} popup templates survived`);
+}
 
 const bodyOpen = slice(src, '<body', '>', '<body>');
 

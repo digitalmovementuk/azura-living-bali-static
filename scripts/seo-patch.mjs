@@ -58,11 +58,45 @@ const BOOKING_URL = 'https://api.leadconnectorhq.com/widget/bookings/azura-disco
 const BROCHURE_URL =
   'https://wa.me/6282322846087?text=Hi%2C%20could%20you%20please%20share%20the%20Azura%20brochure%20with%20me%3F';
 
+// The ROI calculator's Tailwind build, taken off jsdelivr and served from here.
+// Refresh it with:
+//   curl -sL -o public/assets/js/tailwind-browser-4.js \
+//     https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4
+const TAILWIND_PATH = 'assets/js/tailwind-browser-4.js';
+
 /** Replace `from` with `to`; record a failure if `from` is not present. */
 function sub(html, from, to, label) {
   if (html.includes(to)) return html;          // already patched
   if (!html.includes(from)) { failures.push(label); return html; }
   return html.replace(from, to);
+}
+
+/**
+ * Replace every occurrence of `from`, and fail unless there were exactly
+ * `count` of them. Several strings below sit in the page twice, once in the
+ * desktop block and once in the mobile one. Replacing "the" occurrence would
+ * leave the other half of the page saying the opposite, and a presence test
+ * would still pass — so the number is asserted, not the presence.
+ */
+/**
+ * Replace `from` with `to`, with no "already patched" shortcut.
+ *
+ * sub() decides it has already run by looking for `to` in the page, which is
+ * wrong whenever `to` is empty or is ordinary markup like a closing tag —
+ * every page contains those, so sub() reads itself as done and silently
+ * changes nothing. Patching always starts from the pristine page, so here a
+ * missing `from` is a real failure rather than a second run.
+ */
+function rewrite(html, from, to, label) {
+  if (!html.includes(from)) { failures.push(label); return html; }
+  return html.replace(from, to);
+}
+
+function subAll(html, from, to, count, label) {
+  if (html.includes(to) && !html.includes(from)) return html;   // already patched
+  const found = html.split(from).length - 1;
+  if (found !== count) { failures.push(`${label} (${found} of ${count})`); return html; }
+  return html.split(from).join(to);
 }
 
 let html = fs.readFileSync(PAGE, 'utf8');
@@ -469,6 +503,116 @@ const SECTION = `
 ${OPENER}
 `;
 
+// ---------------------------------------------------------------------------
+// 5. "Freehold", in five places.
+//
+//    The section we add says plainly that no foreigner can hold Hak Milik,
+//    Indonesia's freehold title, because the law reserves it for Indonesian
+//    citizens. The client's older copy called the same villas freehold in five
+//    places, so the page contradicted itself and the wrong half was the
+//    marketing, not the law. What the client actually sells is an extendable
+//    80-year lease.
+//
+//    Every figure the client quotes is kept. Only the legal word changes, and
+//    the returns figure stops reading as a promise. Written by Fable 5.
+// ---------------------------------------------------------------------------
+const WC = '<div class="elementor-widget-container">\n\t\t\t\t\t\t\t\t\t';
+const WE = '\t\t\t\t\t\t\t\t</div>';
+
+// Once, in the visible text widget. The unpatched page has this line three
+// times, but the other two are inside the meta description this script has
+// already rewritten by the time it gets here.
+html = subAll(
+  html,
+  'Secure Your Freehold Villa in Bali&#8217;s Next Hotspot',
+  'Secure Your Leasehold Villa in Bali&#8217;s Next Hotspot',
+  1,
+  'hero freehold line'
+);
+
+// The stat strip reads "Up to / 80 / yrs / <label>" and "Up to / 18% / <label>".
+html = subAll(html, `${WC}Freehold Ownership${WE}`, `${WC}Extendable Lease${WE}`,
+  1, 'stat label: ownership');
+html = subAll(html, `${WC}Annual Returns${WE}`, `${WC}Projected Annual Return${WE}`,
+  1, 'stat label: returns');
+
+html = subAll(html, 'Freehold titles up to 80 years', 'Leasehold terms up to 80 years',
+  1, 'benefits bullet');
+html = subAll(html, 'Extendable 80 years Freehold ownership', 'Extendable 80-year villa lease',
+  1, 'spec line (upper)');
+html = subAll(html, 'Extendable 80 years freehold ownership', 'Extendable 80-year villa lease',
+  1, 'spec line (lower)');
+
+// The one-word spec label, once in the desktop block and once in the mobile one.
+html = subAll(html, `${WC}Freehold${WE}`, `${WC}80-Year Lease${WE}`, 2, 'spec label');
+
+// "ROI up to 18% p.a." stated a return as fact on a page that now says returns
+// are never promised. Same figure, no promise.
+html = subAll(html, `${WC}ROI up to 18% p.a.${WE}`, `${WC}Projected ROI up to 18% p.a.${WE}`,
+  2, 'ROI card');
+
+// ---------------------------------------------------------------------------
+// 6. The ROI calculator was a whole second HTML document.
+//
+//    It had been pasted into an Elementor HTML widget complete with its own
+//    <!DOCTYPE>, <html>, <head>, <title> and <body> — in the middle of the
+//    page. The page therefore carried two <title> elements, and the stray
+//    </body></html> put every tag after it into the parser's after-body mode.
+//    The calculator's own markup, styles and script are fine; only the wrapper
+//    has to go, and nothing moves, because each tag is removed in place.
+//
+//    Its Tailwind build also came from jsdelivr at run time, which is a third
+//    party watching every visitor arrive. It is now served from this site.
+// ---------------------------------------------------------------------------
+html = rewrite(
+  html,
+  '<!DOCTYPE html>\n<html lang="en">\n  <head>\n    \n'
+    + '    <meta name="viewport" content="width=device-width, initial-scale=1.0" />\n'
+    + '    <title>Azura ROI Calculator</title>\n',
+  '',
+  'calculator: nested doctype and title'
+);
+html = rewrite(html, '</head>\n\n  <body class="bg-black text-white">', '',
+  'calculator: nested head and body tags');
+html = rewrite(html, '</body>\n</html>\n\t\t\t\t</div>', '\t\t\t\t</div>',
+  'calculator: nested closing tags');
+//    The tag it came in on was also a WP Rocket "load this once the visitor
+//    interacts" script. Every one of the calculator's own styles is a Tailwind
+//    utility class, so until someone moved a mouse the calculator rendered
+//    unstyled: no dark panel, no rounded corners, sliders at full page width.
+//    It now loads itself when the calculator comes within 600px of the screen,
+//    which is deterministic, still costs nothing to a visitor who never scrolls
+//    that far, and no longer depends on a plugin's guess about interaction.
+html = rewrite(
+  html,
+  '<script type="rocketlazyloadscript" data-rocket-src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4" data-rocket-defer defer></script>',
+  `<script id="azura-tailwind-loader">
+(function () {
+  var done = false;
+  function load() {
+    if (done) return;
+    done = true;
+    var s = document.createElement('script');
+    s.src = '/${TAILWIND_PATH}';
+    document.head.appendChild(s);
+  }
+  function start() {
+    var target = document.getElementById('calculator');
+    if (!target || !('IntersectionObserver' in window)) return load();
+    new IntersectionObserver(function (entries, obs) {
+      for (var i = 0; i < entries.length; i++) {
+        if (entries[i].isIntersecting) { obs.disconnect(); load(); return; }
+      }
+    }, { rootMargin: '600px' }).observe(target);
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', start, { once: true });
+  } else start();
+})();
+</script>`,
+  'calculator: self-hosted Tailwind'
+);
+
 // The stylesheet goes in <head>, not beside the markup: the guide page is
 // built from this <head>, so linking it once here covers both pages.
 if (!html.includes(`id="${MARK}-css"`)) {
@@ -524,6 +668,7 @@ if (CHECK) {
     ['content section', 'id="bali-property-investment"'],
     ['stylesheet link', `id="${MARK}-css"`],
     ['calculator anchor', 'id="calculator"'],
+    ['calculator styling', 'id="azura-tailwind-loader"'],
     ['end actions', `${MARK}-actions`],
     ['json-ld', `class="${MARK}-schema"`],
     ['lang en-GB', '<html lang="en-GB"'],
@@ -541,6 +686,41 @@ if (CHECK) {
   const rows = (current.match(new RegExp(`<details class="${MARK}-q" id="[^"]+">`, 'g')) || []).length;
   const expected = COPY.sections.length - OPEN;
   if (rows !== expected) missing.push(`disclosure rows (${rows} of ${expected})`);
+
+  // Nothing on the page may call a foreign buyer's villa freehold, and the
+  // returns figure may not stand on its own. Both of these are counted, not
+  // looked for: the strings sit in the page twice, desktop and mobile, and one
+  // surviving copy is exactly the failure a presence test cannot see.
+  // Our own section is cut out first. It uses the word correctly and often —
+  // "Indonesian law reserves freehold title, called Hak Milik, for Indonesian
+  // citizens" is the whole point of the page. What must not survive is the
+  // client's older copy calling a foreign buyer's villa freehold.
+  const clientCopy = current.replace(
+    /<section class="azura-invest" id="bali-property-investment"[\s\S]*?<\/section>/,
+    ''
+  );
+  const freehold = (clientCopy.match(/[Ff]reehold/g) || []).length;
+  if (freehold) missing.push(`"freehold" still in the client copy (${freehold}x)`);
+  const bareRoi = (current.match(/(?<!Projected )ROI up to 18% p\.a\./g) || []).length;
+  if (bareRoi) missing.push(`unqualified ROI claim (${bareRoi}x)`);
+
+  // The calculator's wrapper. Two <title> elements in one document is the tell.
+  const titles = (current.match(/<title[ >]/g) || []).length;
+  if (titles !== 1) missing.push(`<title> elements (${titles}, expected 1)`);
+  const doctypes = (current.match(/<!DOCTYPE/gi) || []).length;
+  if (doctypes !== 1) missing.push(`<!DOCTYPE> (${doctypes}, expected 1)`);
+  const bodies = (current.match(/<\/body>/gi) || []).length;
+  if (bodies !== 1) missing.push(`</body> (${bodies}, expected 1)`);
+
+  // No third party may be called at run time. Commented-out markup is cut
+  // first: an earlier build left two <!-- --> select2 tags in the page, and a
+  // comment fetches nothing.
+  const liveMarkup = current.replace(/<!--[\s\S]*?-->/g, '');
+  const cdn = (liveMarkup.match(/src="https?:\/\/cdn\.jsdelivr\.net[^"]*"/g) || []).length;
+  if (cdn) missing.push(`live jsdelivr script (${cdn}x)`);
+  const tw = path.join(ROOT, 'public', TAILWIND_PATH);
+  if (!fs.existsSync(tw)) missing.push(`Tailwind build (public/${TAILWIND_PATH})`);
+  else if (fs.statSync(tw).size < 100_000) missing.push('Tailwind build looks truncated');
   if (missing.length) {
     console.error('MISSING: ' + missing.join(', '));
     process.exit(1);
