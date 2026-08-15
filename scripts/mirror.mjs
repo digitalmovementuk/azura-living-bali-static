@@ -26,6 +26,16 @@ let downloadedBytes = 0;
 const poweredByDigitalMovement =
   "<div class=\"dm-powered-by\" style=\"margin-top:16px;display:flex;align-items:center;justify-content:center;gap:9px;flex-wrap:wrap;\"><span style=\"font-size:12px;letter-spacing:.08em;text-transform:uppercase;opacity:.65;\">Powered by</span><a href=\"https://digitalmovement.uk/\" target=\"_blank\" rel=\"noopener\" title=\"Website by Digital Movement\" style=\"display:inline-flex;align-items:center;line-height:0;\"><img src=\"/assets/images/digital-movement-logo.svg\" alt=\"Digital Movement\" width=\"150\" height=\"32\" style=\"height:22px;width:auto;display:block;\"></a></div>";
 
+// GA4 property 550020028, owned by alex@digitalmovement.uk. Self-contained on
+// purpose: the page already loads gtag.js for Site Kit's GT-PZQ3SZLX, but that
+// tag belongs to the old WordPress setup and could be removed at any time.
+const ga4MeasurementId = "G-Q8P7PZWE38";
+const ga4Snippet =
+  "\n<!-- Google Analytics 4 (Digital Movement) -->\n"
+  + "<script async src=\"https://www.googletagmanager.com/gtag/js?id=" + ga4MeasurementId + "\"></script>\n"
+  + "<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}"
+  + "gtag('js',new Date());gtag('config','" + ga4MeasurementId + "');</script>\n";
+
 const replacements = new Map([
   ["6281241960867", "6282322846087"],
   [
@@ -333,6 +343,11 @@ const premiumMenuMarkup = `<nav id="azura-primary-menu" class="menu-popup" aria-
 function cleanMarkup(text) {
   let output = text;
   for (const [from, to] of replacements) output = output.replaceAll(from, to);
+  // Sits directly after the charset meta so measurement starts as early as
+  // possible. Guarded so a second mirror run cannot stack two copies.
+  if (!output.includes(ga4MeasurementId)) {
+    output = output.replace(/(<meta charset=["']UTF-8["']>)/i, "$1" + ga4Snippet);
+  }
   let firstRocketPairsBlock = true;
   output = output.replace(
     /<script type="application\/javascript">const rocket_pairs = \[[\s\S]*?const rocket_excluded_pairs = \[\];<\/script>/g,
