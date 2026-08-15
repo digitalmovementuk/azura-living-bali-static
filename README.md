@@ -49,6 +49,12 @@ properties of Yoast's own scale rather than of these pages:
 - `scripts/build-guide.mjs` — builds the guide page out of `public/index.html`,
   so its header, footer and stylesheet stay byte-identical to the rest of the
   site. Re-run it after any home page change. `--check` fails if it is stale.
+- `scripts/invest-css.mjs` — the one stylesheet behind both pages. Both used to
+  carry a near-identical copy of it in an inline `<style>` block, which is how
+  they drifted apart. `seo-patch.mjs` writes it to
+  `public/assets/css/azura-invest.css` and links it with a content hash in the
+  query string, so a change lands on both pages or on neither and no visitor
+  gets a stale copy. `--check` fails if the file on disk is missing or stale.
 - `scripts/yoast-check.mjs` — scores `public/index.html` with Yoast SEO's own
   compiled analysis engine (via
   `Live Projects/DM UK/wordpress-dmuk/bin/yoast-score.mjs`) and prints every
@@ -74,7 +80,31 @@ home page: more than half the site was body copy, and scrolling it felt
 broken. As disclosure rows it is about 3,000px and the home page is 12,100px.
 Every word is still in the HTML, so the Yoast scores are unchanged and a
 crawler reads all of it. `seo-patch.mjs --check` counts the rows and fails if
-the number is short — a presence test would pass on a half-built wall.
+the number is short — a presence test would pass on a half-built wall. Each
+row carries an id built from its heading, and a small script opens the matching
+row when someone arrives on a link to it, so a shared link still lands on an
+answer. The guide page takes the other route: twelve headings is too many to
+scroll blind, so it opens with a jump list. Every jump target — headings, rows
+and the home page's calculator — carries `scroll-margin-top: 98px`, because the
+site header is fixed and 74px tall and would otherwise sit on top of whatever
+you jumped to.
+
+**Where the two buttons at the end of each page point.** The footer's own
+buttons are `display:none` site-wide, so without them the end of a long page
+has nothing to click. Both reuse the client's own destinations, not new ones:
+"Book Discovery Call" goes to the LeadConnector booking widget, and "Download
+Brochure" goes to the same WhatsApp link as the page's own three brochure
+buttons. There *is* an Elementor brochure form in the page source, but it sits
+inside a popup template that never reaches the DOM — `document.querySelector`
+finds no form on the rendered page at all — so an anchor to it is a dead link.
+Check a target by querying the rendered page, not by searching the HTML.
+
+**Specificity.** `.azura-invest p` is a class plus an element, so it beats any
+bare component class on a paragraph, and `.azura-invest a` beats one on a link.
+Both have already shipped as bugs: a black button with black text, and a legal
+note rendering at body size in body colour. Every rule for a paragraph or a
+link in `invest-css.mjs` therefore names its element — `p.azura-invest-note`,
+`a.azura-invest-btn`. Confirm by reading the computed style, not the source.
 
 **Image alt text.** The photographs describe what they show and where it is.
 The icons keep `alt=""` on purpose: each one sits beside its own text label,

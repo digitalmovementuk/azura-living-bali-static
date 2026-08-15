@@ -15,7 +15,9 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
+import { CSS, CSS_PATH } from './invest-css.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '..');
@@ -34,6 +36,27 @@ function esc(s) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
 }
+
+/** A stable id for a heading, so a row can be linked to and found again. */
+function slug(text) {
+  return String(text)
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&[a-z]+;|&#\d+;/gi, ' ')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 60);
+}
+
+// The site's own booking widget, already linked from ten places on the page.
+const BOOKING_URL = 'https://api.leadconnectorhq.com/widget/bookings/azura-discovery-call';
+
+// The site's own brochure link, copied from its three "Download Brochure"
+// buttons. There is an Elementor brochure form in the page source, but it sits
+// inside a popup template that never reaches the DOM, so an anchor to it is a
+// dead link. WhatsApp is the route the client actually built.
+const BROCHURE_URL =
+  'https://wa.me/6282322846087?text=Hi%2C%20could%20you%20please%20share%20the%20Azura%20brochure%20with%20me%3F';
 
 /** Replace `from` with `to`; record a failure if `from` is not present. */
 function sub(html, from, to, label) {
@@ -363,76 +386,16 @@ if (!html.includes(MAIN_OPEN)) {
 // 6. The content section itself, inserted immediately before the footer —
 //    the last thing read before the brochure form.
 // ---------------------------------------------------------------------------
-const CSS = `
-<style id="${MARK}-css">
-.${MARK}{background:#FDF9EE;color:#2E2E2E;padding:96px 24px;
-  font-family:"Inter","Inter Tight",system-ui,sans-serif;
-  -webkit-hyphens:auto;hyphens:auto}
-.${MARK}-inner{max-width:760px;margin:0 auto}
-.${MARK}-eyebrow{display:block;font-size:.75rem;letter-spacing:.22em;
-  text-transform:uppercase;color:#CFB010;margin:0 0 18px;font-weight:600}
-.${MARK} h2{font-family:"The Seasons","Lora",Georgia,serif;font-weight:400;
-  font-size:clamp(1.6rem,3.4vw,2.3rem);line-height:1.22;color:#2E2E2E;
-  margin:56px 0 18px;letter-spacing:-.01em}
-.${MARK} h2:first-of-type{margin-top:0}
-.${MARK} h3{font-family:"Inter",system-ui,sans-serif;font-weight:600;
-  font-size:1.0625rem;letter-spacing:.01em;color:#2E2E2E;margin:32px 0 12px}
-.${MARK} p{font-size:1.0625rem;line-height:1.72;margin:0 0 20px;color:#3A3A3A}
-.${MARK} a{color:#2E2E2E;text-decoration:underline;text-underline-offset:3px;
-  text-decoration-color:#CFB010;text-decoration-thickness:2px}
-.${MARK} a:hover{color:#000}
-.${MARK}-figure{margin:48px 0}
-.${MARK}-figure img{width:100%;height:auto;display:block;border-radius:2px}
-.${MARK}-figure figcaption{font-size:.8125rem;color:#7A7466;margin-top:10px}
-.${MARK} strong{font-weight:600;color:#2E2E2E}
-.${MARK}-close{margin-top:56px;padding-top:28px;border-top:1px solid #E6E1D8;
-  font-size:1.0625rem;color:#2E2E2E}
-.${MARK}-note{font-size:.875rem;line-height:1.6;color:#7A7466;margin-top:32px}
-/* Everything past the ownership answer is a disclosure row. The words are
-   still in the page for a reader and for a crawler, but the section is about
-   1,200px tall instead of 9,700px, so the home page scrolls like a home page
-   again. Each row is one question, which is how visitors read this material
-   anyway. */
-.${MARK}-q{border-top:1px solid #E6E1D8}
-/* No bottom rule on the last row: the closing line below draws its own, and
-   two hairlines 20px apart read as a mistake. */
-.${MARK}-q:last-of-type{border-bottom:0}
-.${MARK}-q + .${MARK}-close{margin-top:0}
-.${MARK}-q>summary{list-style:none;cursor:pointer;padding:22px 48px 22px 0;
-  position:relative}
-.${MARK}-q>summary::-webkit-details-marker{display:none}
-.${MARK}-q>summary::after{content:"";position:absolute;right:10px;top:50%;
-  width:9px;height:9px;margin-top:-8px;border-right:2px solid #CFB010;
-  border-bottom:2px solid #CFB010;transform:rotate(45deg);
-  transition:transform .18s ease}
-.${MARK}-q[open]>summary::after{transform:rotate(-135deg);margin-top:-3px}
-.${MARK}-q>summary h2{font-size:clamp(1.0625rem,1.9vw,1.3125rem);margin:0;
-  line-height:1.35;display:inline-block;vertical-align:middle}
-.${MARK}-q>summary:hover h2{color:#000}
-.${MARK}-q-body{padding:0 0 14px}
-.${MARK}-q-body>*:first-child{margin-top:0}
-.${MARK}-q-body p:last-child{margin-bottom:0}
-.${MARK}-q-body .${MARK}-figure{margin:28px 0 8px}
-/* The hero. The eyebrow carries the keyphrase above the client's own display
-   line, so both survive; it must never run into it. Colours are inherited
-   from the hero widget, because the hero sits on video and its text is white. */
-.${MARK}-h1-eyebrow{display:block;font-family:"Inter","Inter Tight",system-ui,sans-serif;
-  font-size:clamp(.7rem,1vw,.8125rem);letter-spacing:.22em;text-transform:uppercase;
-  font-weight:600;color:#E8C84B;line-height:1.35;margin:0 0 20px}
-.${MARK}-h1-main{display:block}
-.${MARK}-hero-lede{color:inherit;font-size:clamp(1rem,1.3vw,1.1875rem);
-  line-height:1.55;margin:0 0 10px;max-width:46ch}
-.${MARK}-hero-sub{color:inherit;margin:0;opacity:.85}
-/* Semantics only: this heading must look exactly like the text widget it
-   replaced, so every inherited heading style is reset. */
-.${MARK}-h2v{font:inherit;color:inherit;letter-spacing:inherit;
-  line-height:inherit;text-transform:inherit;margin:0;padding:0;display:inline}
-@media (max-width:768px){
-  .${MARK}{padding:64px 20px}
-  .${MARK} h2{margin:44px 0 14px}
-  .${MARK} p{font-size:1rem;line-height:1.7}
+// The stylesheet is a real file, shared with the guide page. Writing it here
+// keeps it beside the markup that needs it, and the query string is a hash of
+// its own contents so a change is never served from cache.
+const CSS_FILE = path.join(ROOT, 'public', CSS_PATH);
+const CSS_HASH = crypto.createHash('sha1').update(CSS).digest('hex').slice(0, 8);
+const CSS_LINK = `<link rel="stylesheet" id="${MARK}-css" href="/${CSS_PATH}?v=${CSS_HASH}">`;
+if (!CHECK) {
+  fs.mkdirSync(path.dirname(CSS_FILE), { recursive: true });
+  fs.writeFileSync(CSS_FILE, CSS);
 }
-</style>`;
 
 // The first OPEN sections read straight down the page: they answer "can a
 // foreigner buy property in Bali?", which is the question the search traffic
@@ -442,6 +405,7 @@ const OPEN = 3;
 
 const blocks = COPY.sections
   .map((s, i) => {
+    const id = slug(s.h2);
     const body = [];
     for (const p of s.paragraphs) body.push(`<p>${p}</p>`);
     if (s.h3) {
@@ -458,23 +422,71 @@ const blocks = COPY.sections
         + `<figcaption>${esc(f.caption)}</figcaption></figure>`
       );
     }
-    if (i < OPEN) return [`<h2>${s.h2}</h2>`, ...body].join('\n');
-    return `<details class="${MARK}-q">\n`
+    if (i < OPEN) return [`<h2 id="${id}">${s.h2}</h2>`, ...body].join('\n');
+    return `<details class="${MARK}-q" id="${id}">\n`
       + `<summary><h2>${s.h2}</h2></summary>\n`
       + `<div class="${MARK}-q-body">\n${body.join('\n')}\n</div>\n</details>`;
   })
   .join('\n');
 
-const SECTION = `${CSS}
+// A shared link should land on the row it names, already open. Without this a
+// visitor following "…/#the-real-risks-of-a-bali-property-investment" arrives
+// at a closed row and sees nothing.
+const OPENER = `<script>
+(function () {
+  function reveal() {
+    var id = decodeURIComponent(location.hash.slice(1));
+    if (!id) return;
+    var el = document.getElementById(id);
+    if (!el) return;
+    var row = el.closest ? el.closest('details') : null;
+    if (!row || row.open) return;
+    row.open = true;
+    requestAnimationFrame(function () { row.scrollIntoView(); });
+  }
+  window.addEventListener('hashchange', reveal);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', reveal, { once: true });
+  } else reveal();
+})();
+</script>`;
+
+const ACTIONS = `<div class="${MARK}-actions">
+      <a class="${MARK}-btn ${MARK}-btn-primary" href="${BROCHURE_URL}" target="_blank" rel="noopener">Download Brochure</a>
+      <a class="${MARK}-btn ${MARK}-btn-secondary" href="${BOOKING_URL}" target="_blank" rel="noopener">Book Discovery Call</a>
+    </div>`;
+
+const SECTION = `
 <section class="${MARK}" id="bali-property-investment" aria-labelledby="${MARK}-title">
   <div class="${MARK}-inner">
     <span class="${MARK}-eyebrow">${esc(COPY.eyebrow)}</span>
-    ${blocks.replace('<h2>', `<h2 id="${MARK}-title">`)}
+    ${blocks.replace(`<h2 id="${slug(COPY.sections[0].h2)}">`, `<h2 id="${MARK}-title">`)}
     <p class="${MARK}-close"><strong>${COPY.closing_line}</strong></p>
+    ${ACTIONS}
     <p class="${MARK}-note">${COPY.legal_note}</p>
   </div>
 </section>
+${OPENER}
 `;
+
+// The stylesheet goes in <head>, not beside the markup: the guide page is
+// built from this <head>, so linking it once here covers both pages.
+if (!html.includes(`id="${MARK}-css"`)) {
+  const linked = html.replace('</head>', `${CSS_LINK}\n</head>`);
+  if (linked === html) failures.push('stylesheet link');
+  else html = linked;
+}
+
+// The ROI calculator had no id at all — it was addressed only by a class the
+// menu script reads — so the guide page's link to it went nowhere.
+if (!/\bid="calculator"/.test(html)) {
+  const withCalc = html.replace(
+    /(<div class="elementor-element elementor-element-49a1d52 )/,
+    '<div id="calculator"></div>$1'
+  );
+  if (withCalc === html) failures.push('calculator anchor');
+  else html = withCalc;
+}
 
 if (!html.includes('id="bali-property-investment"')) {
   if (html.includes(MAIN_TAIL)) {
@@ -510,6 +522,9 @@ if (CHECK) {
     ['main landmark', MAIN_OPEN],
     ['main closed', '</main>'],
     ['content section', 'id="bali-property-investment"'],
+    ['stylesheet link', `id="${MARK}-css"`],
+    ['calculator anchor', 'id="calculator"'],
+    ['end actions', `${MARK}-actions`],
     ['json-ld', `class="${MARK}-schema"`],
     ['lang en-GB', '<html lang="en-GB"'],
   ];
@@ -521,7 +536,9 @@ if (CHECK) {
   // build — some sections wrapped, the rest left as a wall — still contains
   // the marker class, so a presence test would pass while the page was 9,000px
   // tall again.
-  const rows = (current.match(new RegExp(`<details class="${MARK}-q">`, 'g')) || []).length;
+  if (!fs.existsSync(CSS_FILE)) missing.push(`stylesheet file (public/${CSS_PATH})`);
+  else if (fs.readFileSync(CSS_FILE, 'utf8') !== CSS) missing.push('stylesheet file is stale');
+  const rows = (current.match(new RegExp(`<details class="${MARK}-q" id="[^"]+">`, 'g')) || []).length;
   const expected = COPY.sections.length - OPEN;
   if (rows !== expected) missing.push(`disclosure rows (${rows} of ${expected})`);
   if (missing.length) {

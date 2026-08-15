@@ -39,6 +39,25 @@ function esc(s) {
     .replace(/"/g, '&quot;');
 }
 
+/** A stable id for a heading, so the jump list can address it. */
+function slug(text) {
+  return String(text)
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&[a-z]+;|&#\d+;/gi, ' ')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 60);
+}
+
+// The site's own booking widget, already linked from the home page.
+const BOOKING_URL = 'https://api.leadconnectorhq.com/widget/bookings/azura-discovery-call';
+
+// The site's own brochure link. Same URL as the home page's three "Download
+// Brochure" buttons — see the note in seo-patch.mjs for why this is not a form.
+const BROCHURE_URL =
+  'https://wa.me/6282322846087?text=Hi%2C%20could%20you%20please%20share%20the%20Azura%20brochure%20with%20me%3F';
+
 /** Slice from `startNeedle` up to and including `endNeedle`. */
 function slice(html, startNeedle, endNeedle, label) {
   const a = html.indexOf(startNeedle);
@@ -135,87 +154,69 @@ const bodyOpen = slice(src, '<body', '>', '<body>');
 // <main> — the guide itself.
 // ---------------------------------------------------------------------------
 const blocks = COPY.sections
-  .map((s, i) => {
-    const parts = [`<h2${i === 0 ? ` id="${MARK}-title"` : ''}>${s.h2}</h2>`];
-    for (const p of s.paragraphs) parts.push(`<p>${p}</p>`);
-    if (s.h3) {
-      parts.push(`<h3>${s.h3}</h3>`);
-      for (const p of s.h3_paragraphs || []) parts.push(`<p>${p}</p>`);
+  .map((sec, i) => {
+    const parts = [`<h2 id="${slug(sec.h2)}">${sec.h2}</h2>`];
+    for (const p of sec.paragraphs) parts.push(`<p>${p}</p>`);
+    if (sec.h3) {
+      parts.push(`<h3>${sec.h3}</h3>`);
+      for (const p of sec.h3_paragraphs || []) parts.push(`<p>${p}</p>`);
     }
-    if (i === COPY.image_after_section) {
+    // Three photographs across 1,700 words. A guide this long with one image
+    // reads as a wall; these are the same villas the home page shows, with the
+    // captions already written for them.
+    for (const f of COPY.figures || []) {
+      if (f.after !== i) continue;
       parts.push(
         `<figure class="${MARK}-figure">`
-        + '<img src="/assets/images/tabanan-jatiluwih-rice-terraces.jpg"'
-        + ` alt="${esc(COPY.figure_alt)}" width="1200" height="800" loading="lazy" decoding="async">`
-        + `<figcaption>${esc(COPY.figure_caption)}</figcaption></figure>`
+        + `<img src="${f.src}" alt="${esc(f.alt)}"`
+        + ' width="1200" height="800" loading="lazy" decoding="async">'
+        + `<figcaption>${esc(f.caption)}</figcaption></figure>`
       );
     }
     return parts.join('\n');
   })
   .join('\n');
 
+// Twelve sections over 8,200px. Someone who arrived from "can a foreigner buy
+// property in Bali" wants their own route, not a scroll. The label is a
+// paragraph rather than a heading on purpose: it is interface, and it should
+// not appear in the page's heading outline.
+const TOC = `<nav class="${MARK}-toc" aria-label="${esc(COPY.toc_label)}">
+      <p class="${MARK}-toc-title">${esc(COPY.toc_label)}</p>
+      <ul>
+${COPY.sections.map((sec) => `        <li><a href="#${slug(sec.h2)}">${sec.h2}</a></li>`).join('\n')}
+      </ul>
+    </nav>`;
+
+const ACTIONS = `<div class="${MARK}-actions">
+      <a class="${MARK}-btn ${MARK}-btn-primary" href="${BROCHURE_URL}" target="_blank" rel="noopener">Download Brochure</a>
+      <a class="${MARK}-btn ${MARK}-btn-secondary" href="${BOOKING_URL}" target="_blank" rel="noopener">Book Discovery Call</a>
+    </div>`;
+
 const main = `<main class="site-content" id="content">
-<article class="${MARK} ${MARK}-guide" aria-labelledby="${MARK}-title">
+<article class="${MARK} ${MARK}-guide" aria-labelledby="${MARK}-guide-title">
   <div class="${MARK}-inner">
     <nav class="${MARK}-crumbs" aria-label="Breadcrumb">
       <a href="/">Azura Living Bali</a> <span aria-hidden="true">/</span> Bali Property Investment
     </nav>
-    <h1 class="${MARK}-guide-h1">${esc(COPY.h1)}</h1>
+    <h1 class="${MARK}-guide-h1" id="${MARK}-guide-title">${esc(COPY.h1)}</h1>
     <p class="${MARK}-guide-lede">${COPY.lede}</p>
+    ${TOC}
     ${blocks}
     <p class="${MARK}-close"><strong>${COPY.closing_line}</strong></p>
+    ${ACTIONS}
     <p class="${MARK}-note">${COPY.legal_note}</p>
-    <p class="${MARK}-cta"><a href="/#brochure">Get the full investment brochure</a></p>
   </div>
 </article>
 </main>`;
 
-const css = `<style id="${MARK}-guide-css">
-.${MARK}-guide{background:#FDF9EE;color:#2E2E2E;padding:112px 24px 96px;
-  font-family:"Inter","Inter Tight",system-ui,sans-serif;
-  -webkit-hyphens:auto;hyphens:auto}
-.${MARK}-guide .${MARK}-inner{max-width:760px;margin:0 auto}
-.${MARK}-crumbs{font-size:.8125rem;color:#7A7466;margin:0 0 28px}
-.${MARK}-crumbs a{color:#7A7466;text-decoration:none}
-.${MARK}-crumbs a:hover{color:#2E2E2E;text-decoration:underline}
-.${MARK}-guide .${MARK}-eyebrow{display:block;font-size:.75rem;letter-spacing:.22em;
-  text-transform:uppercase;color:#CFB010;margin:0 0 16px;font-weight:600}
-.${MARK}-guide-h1{font-family:"The Seasons","Lora",Georgia,serif;font-weight:400;
-  font-size:clamp(2rem,5vw,3.1rem);line-height:1.12;letter-spacing:-.015em;
-  color:#2E2E2E;margin:0 0 22px}
-.${MARK}-guide-lede{font-size:1.25rem;line-height:1.6;color:#2E2E2E;margin:0 0 8px}
-.${MARK}-guide h2{font-family:"The Seasons","Lora",Georgia,serif;font-weight:400;
-  font-size:clamp(1.55rem,3.3vw,2.2rem);line-height:1.22;color:#2E2E2E;
-  margin:56px 0 18px;letter-spacing:-.01em}
-.${MARK}-guide h3{font-family:"Inter",system-ui,sans-serif;font-weight:600;
-  font-size:1.0625rem;color:#2E2E2E;margin:32px 0 12px}
-.${MARK}-guide p{font-size:1.0625rem;line-height:1.72;margin:0 0 20px;color:#3A3A3A}
-.${MARK}-guide strong{font-weight:600;color:#2E2E2E}
-.${MARK}-guide a{color:#2E2E2E;text-decoration:underline;text-underline-offset:3px;
-  text-decoration-color:#CFB010;text-decoration-thickness:2px}
-.${MARK}-guide a:hover{color:#000}
-.${MARK}-figure{margin:48px 0}
-.${MARK}-figure img{width:100%;height:auto;display:block}
-.${MARK}-figure figcaption{font-size:.8125rem;color:#7A7466;margin-top:10px}
-.${MARK}-close{margin-top:56px;padding-top:28px;border-top:1px solid #E6E1D8;
-  font-size:1.0625rem;color:#2E2E2E}
-.${MARK}-note{font-size:.875rem;line-height:1.6;color:#7A7466}
-.${MARK}-cta{margin-top:36px}
-.${MARK}-cta a{display:inline-block;background:#2E2E2E;color:#FDF9EE;
-  padding:16px 30px;text-decoration:none;font-size:.9375rem;font-weight:600;
-  letter-spacing:.04em}
-.${MARK}-cta a:hover{background:#000;color:#fff}
-@media (max-width:768px){
-  .${MARK}-guide{padding:80px 20px 64px}
-  .${MARK}-guide h2{margin:44px 0 14px}
-  .${MARK}-guide p{font-size:1rem;line-height:1.7}
-  .${MARK}-guide-lede{font-size:1.125rem}
-}
-</style>`;
+// No stylesheet here. The <head> is taken from the home page, which already
+// links /assets/css/azura-invest.css — one file for both pages, so a change to
+// a shared component cannot land on one and miss the other.
 
 const page = `<!DOCTYPE html>
 <html lang="en-GB">
-${head.replace('</head>', `${css}\n</head>`)}
+${head}
 ${bodyOpen}
 <a class="screen-reader-text skip-link" href="#content" title="Skip to content">Skip to content</a>
 ${header}

@@ -4,8 +4,6 @@
   "slug": "bali-property-investment",
   "canonical": "https://azuralivingbali.com/bali-property-investment/",
   "eyebrow": "Foreign ownership in Indonesia",
-  "figure_alt": "Jatiluwih rice terraces in Tabanan, the district behind this Bali property investment",
-  "image_after_section": 6,
   "sections": [
     {
       "h2": "Can foreigners own property in Bali?",
@@ -123,5 +121,25 @@
   "og_description": "A plain guide to Bali property investment: the three legal ownership routes, the nominee trap, real costs and tax, and how our Tabanan villas fit in.",
   "h1": "Bali Property Investment, Explained for Foreign Buyers",
   "lede": "Foreigners cannot hold freehold here, but three legal routes exist, and Indonesian law spells out each one. So this guide walks you through a Bali property investment step by step, without the sales gloss.",
-  "figure_caption": "The Jatiluwih rice terraces in Tabanan, the regency where Azura Living is building."
+  "toc_label": "On this page",
+  "figures": [
+    {
+      "after": 1,
+      "src": "/wp-content/uploads/2025/07/2-fasad-malam-2.webp",
+      "alt": "Modern villa exterior at night at Azura Living, a Bali property investment in Tabanan",
+      "caption": "A four-bedroom villa at dusk. Twelve are being built; ten are still available."
+    },
+    {
+      "after": 7,
+      "src": "/assets/images/tabanan-jatiluwih-rice-terraces.jpg",
+      "alt": "Jatiluwih rice terraces in Tabanan, the district behind this Bali property investment",
+      "caption": "The Jatiluwih rice terraces in Tabanan, the regency where Azura Living is building."
+    },
+    {
+      "after": 9,
+      "src": "/wp-content/uploads/2025/07/Outdoor-view-sunken-sauna-plunge-pool.jpg",
+      "alt": "Garden with sunken sauna and plunge pool at a Bali property investment villa in Tabanan",
+      "caption": "The garden, sunken sauna and plunge pool that come with every villa."
+    }
+  ]
 }
