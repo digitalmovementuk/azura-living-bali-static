@@ -388,6 +388,31 @@ const CSS = `
 .${MARK}-close{margin-top:56px;padding-top:28px;border-top:1px solid #E6E1D8;
   font-size:1.0625rem;color:#2E2E2E}
 .${MARK}-note{font-size:.875rem;line-height:1.6;color:#7A7466;margin-top:32px}
+/* Everything past the ownership answer is a disclosure row. The words are
+   still in the page for a reader and for a crawler, but the section is about
+   1,200px tall instead of 9,700px, so the home page scrolls like a home page
+   again. Each row is one question, which is how visitors read this material
+   anyway. */
+.${MARK}-q{border-top:1px solid #E6E1D8}
+/* No bottom rule on the last row: the closing line below draws its own, and
+   two hairlines 20px apart read as a mistake. */
+.${MARK}-q:last-of-type{border-bottom:0}
+.${MARK}-q + .${MARK}-close{margin-top:0}
+.${MARK}-q>summary{list-style:none;cursor:pointer;padding:22px 48px 22px 0;
+  position:relative}
+.${MARK}-q>summary::-webkit-details-marker{display:none}
+.${MARK}-q>summary::after{content:"";position:absolute;right:10px;top:50%;
+  width:9px;height:9px;margin-top:-8px;border-right:2px solid #CFB010;
+  border-bottom:2px solid #CFB010;transform:rotate(45deg);
+  transition:transform .18s ease}
+.${MARK}-q[open]>summary::after{transform:rotate(-135deg);margin-top:-3px}
+.${MARK}-q>summary h2{font-size:clamp(1.0625rem,1.9vw,1.3125rem);margin:0;
+  line-height:1.35;display:inline-block;vertical-align:middle}
+.${MARK}-q>summary:hover h2{color:#000}
+.${MARK}-q-body{padding:0 0 14px}
+.${MARK}-q-body>*:first-child{margin-top:0}
+.${MARK}-q-body p:last-child{margin-bottom:0}
+.${MARK}-q-body .${MARK}-figure{margin:28px 0 8px}
 /* The hero. The eyebrow carries the keyphrase above the client's own display
    line, so both survive; it must never run into it. Colours are inherited
    from the hero widget, because the hero sits on video and its text is white. */
@@ -409,25 +434,34 @@ const CSS = `
 }
 </style>`;
 
+// The first OPEN sections read straight down the page: they answer "can a
+// foreigner buy property in Bali?", which is the question the search traffic
+// is actually asking. The rest is real content a serious buyer wants, but not
+// 9,700px of it in front of everyone — those become disclosure rows.
+const OPEN = 3;
+
 const blocks = COPY.sections
   .map((s, i) => {
-    const parts = [`<h2>${s.h2}</h2>`];
-    for (const p of s.paragraphs) parts.push(`<p>${p}</p>`);
+    const body = [];
+    for (const p of s.paragraphs) body.push(`<p>${p}</p>`);
     if (s.h3) {
-      parts.push(`<h3>${s.h3}</h3>`);
-      for (const p of s.h3_paragraphs || []) parts.push(`<p>${p}</p>`);
+      body.push(`<h3>${s.h3}</h3>`);
+      for (const p of s.h3_paragraphs || []) body.push(`<p>${p}</p>`);
     }
     // Photographs break the column and carry alt text of their own.
     for (const f of COPY.figures || []) {
       if (f.after !== i) continue;
-      parts.push(
+      body.push(
         `<figure class="${MARK}-figure">`
         + `<img src="${f.src}" alt="${esc(f.alt)}"`
         + ' width="1200" height="800" loading="lazy" decoding="async">'
         + `<figcaption>${esc(f.caption)}</figcaption></figure>`
       );
     }
-    return parts.join('\n');
+    if (i < OPEN) return [`<h2>${s.h2}</h2>`, ...body].join('\n');
+    return `<details class="${MARK}-q">\n`
+      + `<summary><h2>${s.h2}</h2></summary>\n`
+      + `<div class="${MARK}-q-body">\n${body.join('\n')}\n</div>\n</details>`;
   })
   .join('\n');
 
@@ -483,6 +517,13 @@ if (CHECK) {
   for (const [label, needle] of musts) {
     if (!current.includes(needle)) missing.push(label);
   }
+  // Count the disclosure rows rather than merely looking for one. A partial
+  // build — some sections wrapped, the rest left as a wall — still contains
+  // the marker class, so a presence test would pass while the page was 9,000px
+  // tall again.
+  const rows = (current.match(new RegExp(`<details class="${MARK}-q">`, 'g')) || []).length;
+  const expected = COPY.sections.length - OPEN;
+  if (rows !== expected) missing.push(`disclosure rows (${rows} of ${expected})`);
   if (missing.length) {
     console.error('MISSING: ' + missing.join(', '));
     process.exit(1);

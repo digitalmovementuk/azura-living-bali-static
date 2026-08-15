@@ -66,6 +66,16 @@ copies of it sit inside an `elementor-hidden` container, so no visitor ever
 sees it. Verify heading changes by rendering the page, not by reading the
 HTML — the markup gives no hint that a block is hidden.
 
+**Length.** The first three sections of the added block read straight down the
+page — they answer "can a foreigner buy property in Bali?", which is what the
+search traffic is asking. The remaining eleven are `<details>` rows, one
+question each. Written out in full the block was 9,659px tall on a 18,741px
+home page: more than half the site was body copy, and scrolling it felt
+broken. As disclosure rows it is about 3,000px and the home page is 12,100px.
+Every word is still in the HTML, so the Yoast scores are unchanged and a
+crawler reads all of it. `seo-patch.mjs --check` counts the rows and fails if
+the number is short — a presence test would pass on a half-built wall.
+
 **Image alt text.** The photographs describe what they show and where it is.
 The icons keep `alt=""` on purpose: each one sits beside its own text label,
 so a screen reader that announced them would only repeat itself.
