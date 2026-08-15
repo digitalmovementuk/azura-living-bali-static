@@ -326,6 +326,23 @@ html = html.replace(/<img\b[^>]*>/g, (tag) => {
 });
 
 // ---------------------------------------------------------------------------
+// 4g. /early-bird/ is in the sitemap but had no canonical link of its own.
+//     A URL we ask Google to index should always say which URL it is.
+// ---------------------------------------------------------------------------
+const EARLY = path.join(ROOT, 'public', 'early-bird', 'index.html');
+if (!CHECK && fs.existsSync(EARLY)) {
+  let early = fs.readFileSync(EARLY, 'utf8');
+  if (!early.includes('rel="canonical"')) {
+    const patched = early.replace(
+      /<meta name="robots"/,
+      '<link rel="canonical" href="https://azuralivingbali.com/early-bird/">\n<meta name="robots"'
+    );
+    if (patched === early) failures.push('early-bird canonical');
+    else fs.writeFileSync(EARLY, patched);
+  }
+}
+
+// ---------------------------------------------------------------------------
 // 5. <main> — the mirror has no main landmark, so the page's own "Skip to
 //    content" link lands on a plain <div>. The element with id="content" is
 //    already the content wrapper; promote it to <main>. Its matching close
