@@ -55,10 +55,12 @@ properties of Yoast's own scale rather than of these pages:
   `public/assets/css/azura-invest.css` and links it with a content hash in the
   query string, so a change lands on both pages or on neither and no visitor
   gets a stale copy. `--check` fails if the file on disk is missing or stale.
-- `scripts/yoast-check.mjs` — scores `public/index.html` with Yoast SEO's own
+- `scripts/yoast-check.mjs` — scores **both** pages with Yoast SEO's own
   compiled analysis engine (via
   `Live Projects/DM UK/wordpress-dmuk/bin/yoast-score.mjs`) and prints every
-  assessment that is not green. Exit 0 only at the ceiling above.
+  assessment that is not green. Each page is held to its own ceiling from the
+  table above, so the guide has to reach 99 and the home page 94; exit 0 only
+  when both are there. Add `home` or `guide` to score just one.
 
 ### Two things worth knowing before editing
 
