@@ -129,6 +129,13 @@ if (!CHECK) {
   } else {
     fs.writeFileSync(SOURCE, html);
   }
+} else if (fs.existsSync(SOURCE) && html.includes('id="bali-property-investment"')) {
+  // --check has to run the patch pass over the same source a real run would,
+  // and only skip the write. It used to run it over the finished page instead,
+  // where every *deletion* — the calculator's nested <!DOCTYPE>, its stray
+  // </body> — is already gone, so each one recorded a failure. Those failures
+  // were then never printed, which is the only reason nobody noticed.
+  html = fs.readFileSync(SOURCE, 'utf8');
 }
 
 // ---------------------------------------------------------------------------
@@ -383,20 +390,108 @@ html = html.replace(/<img\b[^>]*>/g, (tag) => {
 });
 
 // ---------------------------------------------------------------------------
-// 4g. /early-bird/ is in the sitemap but had no canonical link of its own.
-//     A URL we ask Google to index should always say which URL it is.
+// 4g. /early-bird/ is the third URL in the sitemap. It is a straight mirror of
+//     the WordPress page, so everything Google reads about it is fixed up here.
+//
+//     Rank Math had built its social description out of an auto-excerpt, which
+//     is why it shipped with a literal `<a class="read-more">` tag and a "..."
+//     inside a meta tag. The title ran to 103 characters and the description to
+//     162, both past what Google shows. Replacement copy written by Fable 5.
+//
+//     This page is patched in place rather than from a pristine copy, so every
+//     edit below has to be idempotent: rewriteEarly() is a no-op once its own
+//     output is present, and reports a failure only when neither the old nor
+//     the new text is there.
 // ---------------------------------------------------------------------------
 const EARLY = path.join(ROOT, 'public', 'early-bird', 'index.html');
-if (!CHECK && fs.existsSync(EARLY)) {
+const EARLY_URL = 'https://azuralivingbali.com/early-bird/';
+const EARLY_META = {
+  title: 'Save $69,000: Early Investor Villas in Bali | Azura Living',
+  description: 'The next 2 villas at Azura Living, Tabanan are 15% off for early '
+    + 'investors: $391,000 instead of $460,000. Projected returns of up to 18.1% a year.',
+  ogTitle: 'Save $69,000 as an Early Investor at Azura Living Bali',
+  ogDescription: 'Two 4-bedroom wellness villas in Tabanan, Bali are open to early '
+    + 'investors at $391,000 instead of $460,000. Projected returns of up to 18.1% a '
+    + 'year, with flexible payment terms.',
+};
+
+if (fs.existsSync(EARLY)) {
   let early = fs.readFileSync(EARLY, 'utf8');
-  if (!early.includes('rel="canonical"')) {
-    const patched = early.replace(
+  const before = early;
+  const earlyFailures = [];
+
+  // Two things this must get right, both learned the hard way elsewhere in this
+  // file. A replacement string is never handed to .replace() directly: every one
+  // of these carries a dollar sign, and "$391,000" in a replacement means
+  // capture group 3. And --check asserts the *value*, not that a replace
+  // happened: /<title>.*?<\/title>/ matches any title at all, so "the replace
+  // succeeded" would report a clean run on completely wrong copy.
+  const rewriteEarly = (re, value, label) => {
+    if (early.includes(value)) return;
+    const out = early.replace(re, () => value);
+    if (out === early) { earlyFailures.push(`${label} (nothing to patch)`); return; }
+    if (CHECK) { earlyFailures.push(label); return; }
+    early = out;
+  };
+
+  if (!early.includes(`<link rel="canonical" href="${EARLY_URL}">`)) {
+    rewriteEarly(
       /<meta name="robots"/,
-      '<link rel="canonical" href="https://azuralivingbali.com/early-bird/">\n<meta name="robots"'
+      `<link rel="canonical" href="${EARLY_URL}">\n<meta name="robots"`,
+      'early-bird canonical'
     );
-    if (patched === early) failures.push('early-bird canonical');
-    else fs.writeFileSync(EARLY, patched);
   }
+
+  // The rest of the site declares en-GB. This page was the only en-US left.
+  // In --check these repair themselves in memory unless they are gated, and a
+  // check that repairs what it is checking always passes.
+  if (/<html[^>]*lang="en-US"/i.test(early) || early.includes('content="en_US"')) {
+    if (CHECK) earlyFailures.push('early-bird lang');
+    else {
+      early = early.replace(/(<html[^>]*)lang="en-US"/i, (m, head) => `${head}lang="en-GB"`);
+      early = early.split('content="en_US"').join('content="en_GB"');
+    }
+  }
+  if (!/<html[^>]*lang="en-GB"/i.test(early)) earlyFailures.push('early-bird lang missing');
+
+  rewriteEarly(/<title>[\s\S]*?<\/title>/, `<title>${esc(EARLY_META.title)}</title>`, 'early-bird title');
+  rewriteEarly(
+    /<meta name="description" content="[^"]*">/,
+    `<meta name="description" content="${esc(EARLY_META.description)}">`,
+    'early-bird description'
+  );
+  rewriteEarly(
+    /<meta property="og:title" content="[^"]*"/,
+    `<meta property="og:title" content="${esc(EARLY_META.ogTitle)}"`,
+    'early-bird og:title'
+  );
+  rewriteEarly(
+    /<meta property="og:description" content="[^"]*"/,
+    `<meta property="og:description" content="${esc(EARLY_META.ogDescription)}"`,
+    'early-bird og:description'
+  );
+  rewriteEarly(
+    /<meta name="twitter:title" content="[^"]*"/,
+    `<meta name="twitter:title" content="${esc(EARLY_META.ogTitle)}"`,
+    'early-bird twitter:title'
+  );
+  rewriteEarly(
+    /<meta name="twitter:description" content="[^"]*"/,
+    `<meta name="twitter:description" content="${esc(EARLY_META.ogDescription)}"`,
+    'early-bird twitter:description'
+  );
+
+  // Same correction as the home page: no foreigner can hold Hak Milik, and the
+  // villas are sold on an extendable lease. Three identical spec lines here.
+  if (early.includes('Extendable 80 years freehold')) {
+    if (CHECK) earlyFailures.push('early-bird lease wording');
+    else early = early.split('Extendable 80 years freehold').join('Extendable 80-year villa lease');
+  }
+  const earlyFreehold = (early.match(/freehold/gi) || []).length;
+  if (earlyFreehold) earlyFailures.push(`early-bird "freehold" survives (${earlyFreehold}x)`);
+
+  failures.push(...earlyFailures);
+  if (!CHECK && early !== before) fs.writeFileSync(EARLY, early);
 }
 
 // ---------------------------------------------------------------------------
@@ -725,11 +820,20 @@ if (CHECK) {
   const tw = path.join(ROOT, 'public', TAILWIND_PATH);
   if (!fs.existsSync(tw)) missing.push(`Tailwind build (public/${TAILWIND_PATH})`);
   else if (fs.statSync(tw).size < 100_000) missing.push('Tailwind build looks truncated');
+  // Everything the patch pass itself could not apply. This block used to exit
+  // before `failures` was ever read, so --check reported a clean run while the
+  // patch pass had already given up on an edit — including every check on
+  // /early-bird/, which is patched in place up in section 4g rather than here.
+  missing.push(...failures);
+
   if (missing.length) {
     console.error('MISSING: ' + missing.join(', '));
     process.exit(1);
   }
-  console.log(`OK — all ${musts.length} SEO edits present in public/index.html`);
+  console.log(
+    `OK — all ${musts.length} SEO edits present in public/index.html, `
+      + 'and /early-bird/ carries its own title, description and lease wording'
+  );
   process.exit(0);
 }
 

@@ -151,6 +151,34 @@ itself as done and silently changes nothing. Deletions and structural edits go
 through `rewrite()`, which has no such shortcut. Patching always starts from
 the pristine page, so a missing needle there is a real failure.
 
+**`/early-bird/` is the third indexed URL.** It is a straight mirror of the
+WordPress page, so section 4g of `seo-patch.mjs` fixes up everything Google
+reads about it: canonical, `lang="en-GB"`, `og:locale`, title, description,
+Open Graph and Twitter cards, and the same leasehold correction as the home
+page. Rank Math had built its social description out of an auto-excerpt, so it
+shipped with a literal `<a class="read-more">` tag and a "…" inside a meta tag;
+its title ran to 103 characters and its description to 162. Replacement copy by
+Fable 5, inside Google's limits (58 / 146 / 54 / 177). Unlike the home page
+this one is patched **in place**, not from a pristine copy, so every edit there
+has to be idempotent.
+
+**A check that repairs what it is checking always passes.** Three separate
+versions of that bug lived in this file at once, and finding one exposed the
+next:
+
+- `--check` ran the whole patch pass over the *finished* page instead of the
+  pristine one, so every deletion — the calculator's nested `<!DOCTYPE>`, its
+  stray `</body>` — found nothing to delete and recorded a failure.
+- Those failures were then never printed: the `--check` block called
+  `process.exit(0)` above the line that reads `failures`. Four broken edits
+  reported a clean run.
+- The early-bird edits rewrote `early` in memory before asserting on it, so
+  `--check` fixed the page it was inspecting and passed. Anything that mutates
+  in `--check` mode is now gated behind `if (CHECK) fail else fix`.
+
+Negative-test every check by breaking the thing it guards and watching it fail.
+Seven of them are broken deliberately on each change to this section.
+
 **Image alt text.** The photographs describe what they show and where it is.
 The icons keep `alt=""` on purpose: each one sits beside its own text label,
 so a screen reader that announced them would only repeat itself.
