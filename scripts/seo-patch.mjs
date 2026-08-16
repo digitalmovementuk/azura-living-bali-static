@@ -287,7 +287,7 @@ html = sub(
   html,
   '<h1 class="elementor-heading-title elementor-size-default">Boutique Villas <br />  by Azura</h1>',
   `<h1 class="elementor-heading-title elementor-size-default ${MARK}-h1">`
-    + `<span class="${MARK}-h1-eyebrow">${esc(COPY.h1_eyebrow)}</span>`
+    + `<span class="${MARK}-h1-eyebrow">${esc(COPY.h1_eyebrow)}</span> `
     + `<span class="${MARK}-h1-main">${COPY.h1_main}</span></h1>`,
   'h1'
 );
@@ -663,6 +663,10 @@ if (CHECK) {
     ['meta description', `<meta name="description" content="${esc(COPY.meta_description)}">`],
     ['canonical', `<link rel="canonical" href="${CANONICAL}">`],
     ['h1 keyphrase', `${MARK}-h1-eyebrow`],
+    // The two H1 spans are both display:block, so a space between them renders
+    // as nothing — but without it every text extractor, Google's included,
+    // reads the heading as one word: "Azura LivingBoutique Villas".
+    ['h1 word break', `</span> <span class="${MARK}-h1-main">`],
     ['main landmark', MAIN_OPEN],
     ['main closed', '</main>'],
     ['content section', 'id="bali-property-investment"'],
