@@ -51,12 +51,25 @@ function slug(text) {
 // The site's own booking widget, already linked from ten places on the page.
 const BOOKING_URL = 'https://api.leadconnectorhq.com/widget/bookings/azura-discovery-call';
 
+// The client's one contact number, confirmed by the client on 2026-08-26:
+// +62 823-2284-6087. It is also the number the page's own brochure buttons
+// already dial, so every use of it — the tel: link, the WhatsApp chip, the
+// brochure link and the label a visitor reads — is built from this constant
+// and the four cannot drift apart.
+//
+// Both social profiles still publish an older number, +62 812-4196-0867. That
+// is a client fix on their side, not a patch; it is flagged in README.md.
+const PHONE_E164 = '+6282322846087';
+const PHONE_DISPLAY = '+62 823-2284-6087';
+const PHONE_URL = `tel:${PHONE_E164}`;
+const WHATSAPP_URL = `https://wa.me/${PHONE_E164.slice(1)}`;
+
 // The site's own brochure link, copied from its three "Download Brochure"
 // buttons. There is an Elementor brochure form in the page source, but it sits
 // inside a popup template that never reaches the DOM, so an anchor to it is a
 // dead link. WhatsApp is the route the client actually built.
 const BROCHURE_URL =
-  'https://wa.me/6282322846087?text=Hi%2C%20could%20you%20please%20share%20the%20Azura%20brochure%20with%20me%3F';
+  `${WHATSAPP_URL}?text=Hi%2C%20could%20you%20please%20share%20the%20Azura%20brochure%20with%20me%3F`;
 
 // The ROI calculator's Tailwind build, taken off jsdelivr and served from here.
 // Refresh it with:
@@ -103,8 +116,21 @@ const ICON_LINKS =
   + '<meta name="theme-color" content="#2C2C2C">';
 
 // Simple Icons paths, drawn at 24x24 and coloured with currentColor so one
-// rule covers the bar and the footer.
+// rule covers the bar, the drawer and the footer. The handset is Material
+// Symbols' "call" at the same 24x24, so the four glyphs share an optical
+// weight; a thin outline phone beside three solid marks reads as a mistake.
 const SOCIAL_SVG = {
+  WhatsApp:
+    '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94'
+    + ' 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198'
+    + ' 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195'
+    + ' 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421'
+    + ' 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03'
+    + ' 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547'
+    + ' 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>',
+  Phone:
+    '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57'
+    + ' 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>',
   Facebook:
     '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M22 12.06C22 6.5'
     + ' 17.52 2 12 2S2 6.5 2 12.06c0 5 3.66 9.15 8.44 9.94v-7.03H7.9v-2.9h2.54V9.85c0-2.52'
@@ -135,14 +161,39 @@ const SOCIAL_SVG = {
  */
 const socialOpen = (place) => `<div class="${MARK}-social ${MARK}-social--${place}">`;
 
-/** The two profile links, as one block. `place` is 'header' or 'footer'. */
+/**
+ * The four chips, in the order they are painted: the two ways to start a
+ * conversation, then the two profiles. WhatsApp and the phone go first because
+ * they are what the page is for — every call-to-action on it ends in a chat —
+ * and a row is read left to right.
+ *
+ * The dialler opens in the page that is already loaded, so `tel:` gets no
+ * target="_blank": a new tab would be left behind, blank, after the call.
+ * `rel="noopener"` goes with every target we do open.
+ *
+ * The labels are what a screen reader announces, and they are not
+ * interchangeable with the profile ones: "Azura Living Bali on WhatsApp" would
+ * describe a profile page, when the link starts a message. The number is read
+ * out in full, so someone who cannot use the link can still write it down.
+ */
+const CHIPS = [
+  { icon: 'WhatsApp', href: WHATSAPP_URL, blank: true,
+    title: 'WhatsApp', label: 'Message Azura Living Bali on WhatsApp' },
+  { icon: 'Phone', href: PHONE_URL, blank: false,
+    title: PHONE_DISPLAY, label: `Call Azura Living Bali on ${PHONE_DISPLAY}` },
+  { icon: 'Facebook', href: FACEBOOK_URL, blank: true,
+    title: 'Facebook', label: 'Azura Living Bali on Facebook' },
+  { icon: 'Instagram', href: INSTAGRAM_URL, blank: true,
+    title: 'Instagram', label: 'Azura Living Bali on Instagram' },
+];
+
+/** All four chips, as one block. `place` is 'header', 'menu' or 'footer'. */
 function socialBlock(place) {
-  const link = (name, href) =>
-    `<a class="${MARK}-social-link" href="${href}" target="_blank" rel="noopener"`
-    + ` aria-label="Azura Living Bali on ${name}" title="${name}">${SOCIAL_SVG[name]}</a>`;
-  return socialOpen(place)
-    + link('Facebook', FACEBOOK_URL) + link('Instagram', INSTAGRAM_URL)
-    + '</div>';
+  const link = (c) =>
+    `<a class="${MARK}-social-link ${MARK}-social-link--${c.icon.toLowerCase()}"`
+    + ` href="${c.href}"` + (c.blank ? ' target="_blank" rel="noopener"' : '')
+    + ` aria-label="${c.label}" title="${c.title}">${SOCIAL_SVG[c.icon]}</a>`;
+  return socialOpen(place) + CHIPS.map(link).join('') + '</div>';
 }
 
 // Kept in a <style> rather than in azura-invest.css because /early-bird/ never
@@ -177,6 +228,31 @@ const SOCIAL_CSS =
   + `padding:0;margin:0;border-radius:50%;border:1px solid rgba(255,255,255,.28);`
   + `background:#2C2C2C;color:#fff;text-decoration:none;flex:0 0 auto;`
   + `transition:background-color .2s ease,border-color .2s ease,color .2s ease}`
+  // WhatsApp is the only chip that is not charcoal, so the row reads as
+  // "message us, call us, then the profiles" rather than as four identical
+  // circles. The phone keeps the charcoal chip: two coloured chips side by
+  // side would be two things shouting, and the green is doing the work.
+  //
+  // #49E670 is not a colour chosen here. It is the exact green of the floating
+  // WhatsApp bubble the client's own page already paints, bottom right, on
+  // every screen — read out of that widget's inline SVG. A second, tidier
+  // green would have put two different WhatsApp buttons on the same phone
+  // screen, which is the one thing a visitor would actually notice. The render
+  // gate reads the bubble's fill off the page and fails if the two drift.
+  //
+  // It is also the one chip that does not clear 4.5:1 on its glyph — white on
+  // this green is 1.7:1. That is the WhatsApp mark in WhatsApp's own colours,
+  // the pairing the bubble beside it already uses, and recolouring a logo to
+  // pass a contrast rule makes it stop being the logo. The other three chips
+  // are held to 4.5:1 as before.
+  //
+  // The ring goes dark here. A white 28% ring is invisible on a light green
+  // chip, so the disc would have lost the edge the other three have.
+  //
+  // The hover rule below carries a pseudo-class and so outranks this one; the
+  // green chip turns gold on hover with the other three.
+  + `.${MARK}-social .${MARK}-social-link--whatsapp{background:#49E670;`
+  + `border-color:rgba(0,0,0,.16)}`
   + `.${MARK}-social .${MARK}-social-link:hover,.${MARK}-social .${MARK}-social-link:focus-visible`
   + `{background:#D1A30A;border-color:#D1A30A;color:#2C2C2C;opacity:1;transform:none}`
   + `.${MARK}-social .${MARK}-social-link svg{width:var(--glyph);height:var(--glyph);`
@@ -1182,6 +1258,11 @@ if (CHECK) {
     ['social stylesheet', `id="${MARK}-social-css"`],
     ['facebook link', FACEBOOK_URL],
     ['instagram link', INSTAGRAM_URL],
+    ['whatsapp link', WHATSAPP_URL],
+    ['phone link', PHONE_URL],
+    // sameAs names profiles, and only profiles. A wa.me link and a tel: are
+    // ways to reach the company, not other pages that are the company, so
+    // they do not belong in this list however tempting the symmetry is.
     ['sameAs', `"sameAs":["${FACEBOOK_URL}","${INSTAGRAM_URL}"]`],
   ];
   const current = fs.readFileSync(PAGE, 'utf8');
@@ -1265,9 +1346,21 @@ if (CHECK) {
   // that an insert ran twice; zero, that its idempotence marker matched
   // something it should not have — which is how the first version of this
   // silently skipped /early-bird/ because the marker was also a CSS rule name.
+  // …and the right number of chips inside each of them. Counting the blocks
+  // alone is not enough now that a block holds four links: adding a chip to
+  // CHIPS but rebuilding only one of the three places would leave the block
+  // count correct and two thirds of the page a version behind.
+  const chipsIn = (src, place) => {
+    const i = src.indexOf(socialOpen(place));
+    if (i === -1) return -1;
+    const j = src.indexOf('</div>', i);
+    return src.slice(i, j).split(`class="${MARK}-social-link `).length - 1;
+  };
   for (const place of ['header', 'footer', 'menu']) {
     const n = current.split(socialOpen(place)).length - 1;
-    if (n !== 1) missing.push(`${place} social links (${n}, expected 1)`);
+    if (n !== 1) { missing.push(`${place} social links (${n}, expected 1)`); continue; }
+    const c = chipsIn(current, place);
+    if (c !== CHIPS.length) missing.push(`${place} chips (${c}, expected ${CHIPS.length})`);
   }
 
   // Every icon and image the head points at has to be a file that is actually
@@ -1313,6 +1406,8 @@ if (CHECK) {
       ['social stylesheet', `id="${MARK}-social-css"`],
       ['facebook link', FACEBOOK_URL],
       ['instagram link', INSTAGRAM_URL],
+      ['whatsapp link', WHATSAPP_URL],
+      ['phone link', PHONE_URL],
     ];
     for (const [label, needle] of ebMusts) {
       if (!eb.includes(needle)) missing.push(`early-bird ${label}`);
@@ -1322,7 +1417,10 @@ if (CHECK) {
     // None in the drawer here: see the note above the removal step.
     for (const [place, want] of [['header', 1], ['footer', 1], ['menu', 0]]) {
       const n = eb.split(socialOpen(place)).length - 1;
-      if (n !== want) missing.push(`early-bird ${place} social links (${n}, expected ${want})`);
+      if (n !== want) { missing.push(`early-bird ${place} social links (${n}, expected ${want})`); continue; }
+      if (!want) continue;
+      const c = chipsIn(eb, place);
+      if (c !== CHIPS.length) missing.push(`early-bird ${place} chips (${c}, expected ${CHIPS.length})`);
     }
   }
 
