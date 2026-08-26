@@ -724,6 +724,7 @@ if (fs.existsSync(EARLY)) {
     else early = early.replace(ICON_TAG, '');
   }
   const EARLY_CANONICAL = `<link rel="canonical" href="${EARLY_URL}">`;
+  const EARLY_ORG_ID = '"@id":"https://azuralivingbali.com/#organization"';
   insertEarly(
     spanFrom('<link rel="icon" href="/favicon.ico"', '</style>'),
     EARLY_CANONICAL,
@@ -803,6 +804,30 @@ if (fs.existsSync(EARLY)) {
     'before',
     'early-bird footer social links'
   );
+
+  // This page carries its own Organization node, and it uses the same @id as
+  // the one on the home page — so it is the same company, described twice. It
+  // had no profiles on it, which would have left the two descriptions
+  // disagreeing about where the company can be found.
+  //
+  // The names disagree too — "Azura Boutique Villas" here against "Azura
+  // Living Bali" on the home page. That is the client's call, not a patch.
+  {
+    const want = `${EARLY_ORG_ID},"sameAs":${JSON.stringify([FACEBOOK_URL, INSTAGRAM_URL])}`;
+    const escaped = EARLY_ORG_ID.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const found = (early.match(new RegExp(`${escaped},"sameAs":\\[[^\\]]*\\]`)) || [])[0];
+    if (found === want) {
+      // already current
+    } else if (CHECK) {
+      earlyFailures.push(found ? 'early-bird sameAs (out of date)' : 'early-bird sameAs');
+    } else if (found) {
+      early = early.replace(found, () => want);
+    } else if (early.includes(EARLY_ORG_ID)) {
+      early = early.replace(EARLY_ORG_ID, () => want);
+    } else {
+      earlyFailures.push('early-bird organization node');
+    }
+  }
 
   failures.push(...earlyFailures);
   if (!CHECK && early !== before) fs.writeFileSync(EARLY, early);
