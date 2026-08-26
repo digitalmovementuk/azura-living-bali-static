@@ -647,6 +647,18 @@ html = subAll(html, `${WC}ROI up to 18% p.a.${WE}`, `${WC}Projected ROI up to 18
   2, 'ROI card');
 
 // ---------------------------------------------------------------------------
+// 5b. Handover moves from Q1 2027 to Q1 2028.
+//
+//    Ayham, the owner, gave the instruction on 2026-08-26. Only the year
+//    changes; the quarter framing is his own. The date sits in the client's
+//    Elementor timeline twice, once in the desktop block and once in the
+//    mobile one, and six more times in our copy (seo-copy.json four, plus the
+//    guide page's guide-copy.json twice). Counted, not looked for: one
+//    surviving 2027 is exactly the failure a presence test cannot see.
+// ---------------------------------------------------------------------------
+html = subAll(html, `${WC}Q1 2027${WE}`, `${WC}Q1 2028${WE}`, 2, 'handover date');
+
+// ---------------------------------------------------------------------------
 // 6. The ROI calculator was a whole second HTML document.
 //
 //    It had been pasted into an Elementor HTML widget complete with its own
@@ -802,6 +814,17 @@ if (CHECK) {
   if (freehold) missing.push(`"freehold" still in the client copy (${freehold}x)`);
   const bareRoi = (current.match(/(?<!Projected )ROI up to 18% p\.a\./g) || []).length;
   if (bareRoi) missing.push(`unqualified ROI claim (${bareRoi}x)`);
+
+  // The handover year. Not one 2027 may survive, and all six 2028s must be
+  // there: two in the client's Elementor timeline (desktop and mobile), one in
+  // the JSON-LD offering description, one in the hero lede and two in the body
+  // copy. Counted for the same reason as the two above — the strings sit in
+  // the page more than once, and a single stale copy is what a presence test
+  // walks straight past.
+  const stale2027 = (current.match(/2027/g) || []).length;
+  if (stale2027) missing.push(`stale 2027 handover date (${stale2027}x)`);
+  const handover2028 = (current.match(/2028/g) || []).length;
+  if (handover2028 !== 6) missing.push(`2028 handover dates (${handover2028} of 6)`);
 
   // The calculator's wrapper. Two <title> elements in one document is the tell.
   const titles = (current.match(/<title[ >]/g) || []).length;

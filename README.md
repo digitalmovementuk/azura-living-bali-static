@@ -187,3 +187,38 @@ so a screen reader that announced them would only repeat itself.
 
 `gh-pages` is the live branch. rsync `public/` into a worktree of
 `origin/gh-pages`, re-`touch .nojekyll`, commit, push.
+
+## The handover date
+
+The owner, Ayham, moved the handover from **Q1 2027 to Q1 2028** on
+2026-08-26. Only the year changed; the quarter framing is his own wording.
+
+The date sits in eight places, and no two of them are edited the same way:
+
+| Where | Source of truth |
+| --- | --- |
+| JSON-LD `offering_description` | `scripts/seo-copy.json` |
+| Hero lede | `scripts/seo-copy.json` |
+| Two body sentences | `scripts/seo-copy.json` |
+| Elementor timeline, desktop **and** mobile | `scripts/seo-patch.mjs`, section 5b |
+| Two sentences on `/bali-property-investment/` | `scripts/guide-copy.json` |
+
+The two Elementor ones are the client's own copy, so a re-mirror would put
+2027 straight back. That is why they are a counted `subAll()` in the patch
+script rather than a hand edit, exactly like the leasehold wording.
+`node scripts/seo-patch.mjs --check` fails on any surviving `2027` and on
+anything other than six `2028`s, and that gate was negative-tested by putting
+one `2027` back and watching it fail.
+
+`/early-bird/` names the handover milestone but carries no date, so it needed
+no change. The brochure itself is not a file on this site — "Download
+Brochure" opens WhatsApp — so whatever date the brochure PDF carries is the
+client's to fix.
+
+## Change log
+
+| Date | Change |
+| --- | --- |
+| 2026-08-26 | Handover date moved from Q1 2027 to Q1 2028 across both pages, with a counted gate in `--check`. |
+| 2026-08-16 | `/early-bird/` made fit to index; `--check` repaired in three places. |
+| 2026-08-15 | Optimised both pages for "bali property investment"; leasehold wording; calculator un-nested. |
