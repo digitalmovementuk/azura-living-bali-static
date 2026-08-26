@@ -183,6 +183,28 @@ Seven of them are broken deliberately on each change to this section.
 The icons keep `alt=""` on purpose: each one sits beside its own text label,
 so a screen reader that announced them would only repeat itself.
 
+## Three things only the client can fix
+
+**The phone number on the profiles.** The site now shows +62 823-2284-6087
+everywhere — the top bar, the mobile menu, the footer on all three pages, the
+brochure buttons. The Facebook Page and the Instagram profile still publish
++62 812-4196-0867. Nothing in this repo can change that; it is two edits in
+their own accounts. Until they are made, Google sees two numbers for one
+business, and the mismatch works against the local listing.
+
+**The floating WhatsApp bubble is on the home page only.** The guide and
+`/early-bird/` do not have it — the guide is built from the home page's head,
+header and footer, and the bubble lives in the body. The new chip row covers
+all three pages, so nobody is stranded, but the two page types do not look the
+same at the bottom right. Adding it is a client-side widget setting.
+
+**The green.** The WhatsApp chip is `#49E670`, taken from that bubble rather
+than chosen. White on it is 1.7:1, well under the 4.5:1 every other icon here
+clears, and it is exempt on WCAG's logotype exception because it is the
+WhatsApp mark in WhatsApp's own colours. If the client ever recolours the
+bubble, the render gate fails rather than shipping two greens; the fix then is
+to move both together.
+
 ## Deploying
 
 `gh-pages` is the live branch. rsync `public/` into a worktree of
@@ -219,6 +241,7 @@ client's to fix.
 
 | Date | Change |
 | --- | --- |
+| 2026-08-26 | WhatsApp and phone chips added to the contact row in all three placements; chip counts and both links gated. |
 | 2026-08-26 | Handover date moved from Q1 2027 to Q1 2028 across both pages, with a counted gate in `--check`. |
 | 2026-08-16 | `/early-bird/` made fit to index; `--check` repaired in three places. |
 | 2026-08-15 | Optimised both pages for "bali property investment"; leasehold wording; calculator un-nested. |
