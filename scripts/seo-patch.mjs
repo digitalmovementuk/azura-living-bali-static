@@ -64,6 +64,140 @@ const BROCHURE_URL =
 //     https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4
 const TAILWIND_PATH = 'assets/js/tailwind-browser-4.js';
 
+// The brand's own social profiles. Both were opened in a browser before being
+// written down: the Instagram bio carries the villa spec word for word, and the
+// Facebook Page's own link, azuraboutiquevillas.com, 301s to this site. That
+// redirect is the only hard proof the accounts belong to this brand.
+//
+// Facebook has two accounts for the same villas: this business Page, and a
+// personal profile at /azura.living.bali. The Page is what `sameAs` should
+// name, because sameAs identifies the organisation, not a person. The
+// duplicate is a client decision, flagged in README.md.
+//
+// The numeric form facebook.com/61576953297102 returns HTTP 400 for this Page.
+// Only the /p/<slug>-<id>/ form resolves. Do not "tidy" this URL.
+const FACEBOOK_URL = 'https://www.facebook.com/p/Azura-Living-Bali-61576953297102/';
+const INSTAGRAM_URL = 'https://www.instagram.com/azura_living_bali/';
+
+// The share image, built by scripts/build-brand-assets.py. The mirror shipped a
+// stray WhatsApp photo at 1214x788 — wrong aspect for a 1.91:1 card, no brand
+// on it — and /early-bird/ declared 900x563 for a file that is not that size.
+// Declared dimensions are read from the constants below in both places, so the
+// two can no longer disagree.
+const OG_IMAGE = 'https://azuralivingbali.com/assets/images/azura-og.jpg';
+const OG_IMAGE_W = 1200;
+const OG_IMAGE_H = 630;
+const OG_IMAGE_OLD =
+  'https://azuralivingbali.com/wp-content/uploads/2025/05/WhatsApp-Image-2025-05-23-at-12.02.00-PM.jpeg';
+
+// Icon set, also from build-brand-assets.py. Every one of these tags used to
+// point at Azura_White_Logo__No_Background_.png: a 512x273 white wordmark on
+// transparency. Not square, and white on Google's white result page — which is
+// why the SERP showed an empty circle where the favicon belongs.
+const ICON_LINKS =
+  '<link rel="icon" href="/favicon.ico" sizes="any">\n'
+  + '<link rel="icon" type="image/png" href="/assets/brand/favicon-96.png" sizes="96x96">\n'
+  + '<link rel="icon" type="image/png" href="/assets/brand/favicon-192.png" sizes="192x192">\n'
+  + '<link rel="apple-touch-icon" href="/assets/brand/apple-touch-icon.png">\n'
+  + '<link rel="manifest" href="/site.webmanifest">\n'
+  + '<meta name="theme-color" content="#2C2C2C">';
+
+// Simple Icons paths, drawn at 24x24 and coloured with currentColor so one
+// rule covers the bar and the footer.
+const SOCIAL_SVG = {
+  Facebook:
+    '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M22 12.06C22 6.5'
+    + ' 17.52 2 12 2S2 6.5 2 12.06c0 5 3.66 9.15 8.44 9.94v-7.03H7.9v-2.9h2.54V9.85c0-2.52'
+    + ' 1.5-3.91 3.77-3.91 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.78-1.63 1.57v1.89h2.78l-.45'
+    + ' 2.9h-2.33V22c4.78-.79 8.44-4.93 8.44-9.94z"/></svg>',
+  Instagram:
+    '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.16c3.2 0 3.58.01'
+    + ' 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41'
+    + ' 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9'
+    + ' 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41-.56-.22-.96-.48-1.38-.9-.42-.42-.68-.82-.9-1.38-.16-.42-.36-1.06-.41-2.23-.06-1.27-.07-1.65-.07-4.85s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68'
+    + ' 1.38-.9.42-.16 1.06-.36 2.23-.41 1.27-.06 1.65-.07 4.85-.07M12 0C8.74 0 8.33.01 7.05.07'
+    + ' 5.78.13 4.9.33 4.14.63a5.9 5.9 0 0 0-2.13 1.38A5.9 5.9 0 0 0 .63 4.14c-.3.76-.5 1.64-.56'
+    + ' 2.91C.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.06 1.27.26 2.15.56 2.91a5.9 5.9 0 0 0 1.38'
+    + ' 2.13 5.9 5.9 0 0 0 2.13 1.38c.76.3 1.64.5 2.91.56C8.33 23.99 8.74 24 12 24s3.67-.01'
+    + ' 4.95-.07c1.27-.06 2.15-.26 2.91-.56a5.9 5.9 0 0 0 2.13-1.38 5.9 5.9 0 0 0'
+    + ' 1.38-2.13c.3-.76.5-1.64.56-2.91.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95c-.06-1.27-.26-2.15-.56-2.91a5.9'
+    + ' 5.9 0 0 0-1.38-2.13A5.9 5.9 0 0 0 19.86.63c-.76-.3-1.64-.5-2.91-.56C15.67.01 15.26 0 12'
+    + ' 0z"/><path d="M12 5.84A6.16 6.16 0 1 0 18.16 12 6.16 6.16 0 0 0 12 5.84M12 16a4 4 0 1 1 4-4'
+    + ' 4 4 0 0 1-4 4z"/><path d="M18.41 4.15a1.44 1.44 0 1 0 1.44 1.44 1.44 1.44 0 0'
+    + ' 0-1.44-1.44z"/></svg>',
+};
+
+/**
+ * The wrapper's opening tag. Used as the marker that says "these links are
+ * already on this page", so it must be a string the stylesheet cannot contain:
+ * `azura-invest-social--header` on its own is also the name of a CSS rule, and
+ * matching that made the idempotence check pass before the links were inserted.
+ */
+const socialOpen = (place) => `<div class="${MARK}-social ${MARK}-social--${place}">`;
+
+/** The two profile links, as one block. `place` is 'header' or 'footer'. */
+function socialBlock(place) {
+  const link = (name, href) =>
+    `<a class="${MARK}-social-link" href="${href}" target="_blank" rel="noopener"`
+    + ` aria-label="Azura Living Bali on ${name}" title="${name}">${SOCIAL_SVG[name]}</a>`;
+  return socialOpen(place)
+    + link('Facebook', FACEBOOK_URL) + link('Instagram', INSTAGRAM_URL)
+    + '</div>';
+}
+
+// Kept in a <style> rather than in azura-invest.css because /early-bird/ never
+// links that stylesheet, and these two links have to look the same on all three
+// pages. The header copy is hidden below 1024px: at that width the bar has
+// already collapsed to the burger, and the brief was desktop only. The footer
+// copy is on every breakpoint.
+const SOCIAL_CSS =
+  `<style id="${MARK}-social-css">`
+  + `.${MARK}-social{display:flex;align-items:center;gap:10px}`
+  // The chip is opaque, and both colours are set outright rather than
+  // inherited. Two reasons, both measured rather than assumed:
+  //
+  // The bar is transparent over whatever the page starts with, and that ranges
+  // from a near-white panel on the guide (luminance 197 of 255) to a dark hero
+  // photo. White on the lightest of those is 1.3:1 — invisible. A solid
+  // #2C2C2C chip holds white at about 14:1 whatever is behind it, and it is
+  // the same charcoal-and-white pairing the favicon uses.
+  //
+  // And the theme hands no colour down to an <a>, so leaving the ring and the
+  // glyph to inherit currentColor painted both the browser's default link blue.
+  + `.${MARK}-social-link{display:inline-flex;align-items:center;justify-content:center;`
+  + `width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.28);`
+  + `background:#2C2C2C;color:#fff;text-decoration:none;flex:0 0 auto;`
+  + `transition:background-color .2s ease,border-color .2s ease,color .2s ease}`
+  + `.${MARK}-social-link:hover,.${MARK}-social-link:focus-visible`
+  + `{background:#D1A30A;border-color:#D1A30A;color:#2C2C2C;opacity:1}`
+  + `.${MARK}-social-link svg{width:15px;height:15px;fill:currentColor;display:block}`
+  // Clear of the menu button. That button is position:fixed at z-index 1000002
+  // and sits over the left of the bar, so the first chip was underneath it and
+  // unclickable — visible on a screenshot, invisible to every measurement that
+  // only asked where the links were. Its right edge is at x=85 at the widest
+  // (early-bird), the block starts at x=52, so 48px leaves a 15px gap.
+  + `.${MARK}-social--header{margin-left:48px}`
+  + `@media (max-width:1024px){.${MARK}-social--header{display:none}}`
+  + `.${MARK}-social--footer{justify-content:center;margin:22px 0 2px}`
+  + '</style>';
+
+// The empty left column of the fixed bar.
+//
+// The bar has three columns: this one, the centred logo, and a right-hand
+// column holding a "Get in Touch" button. The right-hand column is the obvious
+// slot and it is the wrong one — the client's own CSS gives it opacity:0, on
+// the live site as well as here, so everything inside it is invisible while
+// still answering hit-tests. Links put there measured as present, visible and
+// correctly coloured, and could not be seen on a screenshot.
+//
+// This column is genuinely empty (height 0), sits at the left edge of the bar,
+// and balances the hidden column on the right.
+const HEADER_SLOT =
+  '<div class="elementor-element elementor-element-ab14076 e-con-full e-flex e-con e-child"'
+  + ' data-id="ab14076" data-element_type="container" data-e-type="container">';
+// The footer's bottom row, under the copyright line.
+const FOOTER_SLOT = '<div class="dm-powered-by"';
+
 /** Replace `from` with `to`; record a failure if `from` is not present. */
 function sub(html, from, to, label) {
   if (html.includes(to)) return html;          // already patched
@@ -205,6 +339,58 @@ html = html.replace(
 );
 
 // ---------------------------------------------------------------------------
+// 1b. Favicon, share image and the two social links.
+//
+//     The favicon tags are removed by count, not by exact string: there are
+//     four of them (two <link rel=icon>, one apple-touch-icon, one
+//     msapplication-TileImage) and their whitespace comes from WordPress, so
+//     matching the block verbatim would break the next time the mirror is
+//     re-taken. Four is asserted; three or five is a failure.
+// ---------------------------------------------------------------------------
+const ICON_TAG = /<(?:link|meta)[^>]*Azura_White_Logo__No_Background_[^>]*>\s*/g;
+const brokenIcons = (html.match(ICON_TAG) || []).length;
+if (brokenIcons !== 4) failures.push(`old favicon tags (${brokenIcons} of 4)`);
+html = html.replace(ICON_TAG, '');
+html = rewrite(
+  html,
+  `<link rel="canonical" href="${CANONICAL}">`,
+  `<link rel="canonical" href="${CANONICAL}">\n${ICON_LINKS}\n${SOCIAL_CSS}`,
+  'icon block'
+);
+
+// og:image, og:image:secure_url and twitter:image all carry the same URL.
+html = subAll(html, OG_IMAGE_OLD, OG_IMAGE, 3, 'share image url');
+html = html.replace(
+  /<meta property="og:image:width" content="[^"]*" \/>/,
+  `<meta property="og:image:width" content="${OG_IMAGE_W}" />`
+);
+html = html.replace(
+  /<meta property="og:image:height" content="[^"]*" \/>/,
+  `<meta property="og:image:height" content="${OG_IMAGE_H}" />`
+);
+for (const [label, needle] of [
+  ['og:image:width', `<meta property="og:image:width" content="${OG_IMAGE_W}" />`],
+  ['og:image:height', `<meta property="og:image:height" content="${OG_IMAGE_H}" />`],
+]) {
+  if (!html.includes(needle)) failures.push(label);
+}
+// Twitter shows og:image:alt as the card's alt text only if it is repeated
+// here; without it a screen reader announces the card as an unnamed image.
+if (!html.includes('name="twitter:image:alt"')) {
+  html = rewrite(
+    html,
+    `<meta name="twitter:image" content="${OG_IMAGE}" />`,
+    `<meta name="twitter:image" content="${OG_IMAGE}" />\n`
+      + `<meta name="twitter:image:alt" content="${esc(COPY.og_image_alt)}" />`,
+    'twitter:image:alt'
+  );
+}
+
+// The two profile links: desktop bar, then footer.
+html = rewrite(html, HEADER_SLOT, HEADER_SLOT + socialBlock('header'), 'header social links');
+html = rewrite(html, FOOTER_SLOT, socialBlock('footer') + FOOTER_SLOT, 'footer social links');
+
+// ---------------------------------------------------------------------------
 // 2. JSON-LD — the mirrored graph advertises an Article by "Partner Azura".
 //    Replace with a graph that describes what the page is: a real-estate
 //    offering, its seller, and the FAQ the page answers.
@@ -234,6 +420,11 @@ const graph = {
       },
       areaServed: { '@type': 'Place', name: 'Tabanan, Bali, Indonesia' },
       founder: { '@type': 'Person', name: 'Ayham Muhrez', jobTitle: 'Founder' },
+      image: OG_IMAGE,
+      // The profiles Google can use to tie this site to the brand's other
+      // accounts. Only the Facebook Page is listed, not the duplicate personal
+      // profile: sameAs is for the organisation.
+      sameAs: [FACEBOOK_URL, INSTAGRAM_URL],
     },
     {
       '@type': 'WebSite',
@@ -251,6 +442,7 @@ const graph = {
       description: COPY.meta_description,
       isPartOf: { '@id': `${CANONICAL}#website` },
       about: { '@id': `${CANONICAL}#offering` },
+      primaryImageOfPage: { '@type': 'ImageObject', url: OG_IMAGE, width: OG_IMAGE_W, height: OG_IMAGE_H },
       inLanguage: 'en-GB',
     },
     {
@@ -489,6 +681,128 @@ if (fs.existsSync(EARLY)) {
   }
   const earlyFreehold = (early.match(/freehold/gi) || []).length;
   if (earlyFreehold) earlyFailures.push(`early-bird "freehold" survives (${earlyFreehold}x)`);
+
+  // Icons, share image and the two social links — the same treatment the home
+  // page gets in section 1b, written for a page that is patched in place.
+  //
+  // insertEarly() puts a block on the page once, and then keeps it current.
+  //
+  // The obvious version — "if the marker is already there, do nothing" — is
+  // idempotent but wrong: it makes the first insertion permanent. Changing the
+  // stylesheet afterwards left this page painting its icons the browser's
+  // default blue while the two pages built from pristine had already been
+  // corrected, because the no-op branch never looked at what it had inserted.
+  //
+  // So: replace the old block when one is found, insert when none is, and do
+  // nothing when what is there already matches. `region` is a function that
+  // returns the existing block's extent, or null.
+  // `region` must describe exactly the span `block` occupies — otherwise the
+  // comparison never matches and the page is reported out of date on every
+  // run. The anchor is therefore never part of the block: `where` says which
+  // side of it the block goes on.
+  const insertEarly = (region, anchor, block, where, label) => {
+    const found = region(early);
+    if (found === block) return;
+    if (CHECK) { earlyFailures.push(found === null ? label : `${label} (out of date)`); return; }
+    if (found !== null) { early = early.replace(found, () => block); return; }
+    if (!early.includes(anchor)) { earlyFailures.push(`${label} (no anchor)`); return; }
+    early = early.replace(anchor, () => (where === 'before' ? `${block}\n${anchor}` : `${anchor}\n${block}`));
+  };
+  // The extent of a block that starts at a known opening tag and ends at the
+  // first close of that kind. Safe for both blocks here: the <style> holds no
+  // nested style, and the social wrapper holds only anchors and svg.
+  const spanFrom = (open, close) => (src) => {
+    const i = src.indexOf(open);
+    if (i === -1) return null;
+    const j = src.indexOf(close, i + open.length);
+    return j === -1 ? null : src.slice(i, j + close.length);
+  };
+
+  const earlyBrokenIcons = (early.match(ICON_TAG) || []).length;
+  if (earlyBrokenIcons) {
+    if (CHECK) earlyFailures.push(`early-bird old favicon tags (${earlyBrokenIcons}x)`);
+    else early = early.replace(ICON_TAG, '');
+  }
+  const EARLY_CANONICAL = `<link rel="canonical" href="${EARLY_URL}">`;
+  insertEarly(
+    spanFrom('<link rel="icon" href="/favicon.ico"', '</style>'),
+    EARLY_CANONICAL,
+    `${ICON_LINKS}\n${SOCIAL_CSS}`,
+    'after',
+    'early-bird icon block'
+  );
+
+  // This page pointed at a photo of the back facade, and declared it 900x563
+  // when the file is named 1024x640. Both numbers now come from the same two
+  // constants the home page uses, so they cannot drift apart again.
+  const EARLY_OG_OLD =
+    'https://azuralivingbali.com/wp-content/uploads/2025/07/4-fasad-belakang-1024x640.jpg';
+  if (early.includes(EARLY_OG_OLD)) {
+    const n = early.split(EARLY_OG_OLD).length - 1;
+    if (n !== 3) earlyFailures.push(`early-bird share image url (${n} of 3)`);
+    else if (CHECK) earlyFailures.push('early-bird share image url');
+    else early = early.split(EARLY_OG_OLD).join(OG_IMAGE);
+  }
+  rewriteEarly(
+    /<meta property="og:image:width" content="[^"]*" \/>/,
+    `<meta property="og:image:width" content="${OG_IMAGE_W}" />`,
+    'early-bird og:image:width'
+  );
+  rewriteEarly(
+    /<meta property="og:image:height" content="[^"]*" \/>/,
+    `<meta property="og:image:height" content="${OG_IMAGE_H}" />`,
+    'early-bird og:image:height'
+  );
+  // The alt described the old photo of the back facade, so it has to move with
+  // the image. Same wording as the home page, because it is the same picture.
+  rewriteEarly(
+    /<meta property="og:image:alt" content="[^"]*" \/>/,
+    `<meta property="og:image:alt" content="${esc(COPY.og_image_alt)}" />`,
+    'early-bird og:image:alt'
+  );
+  insertEarly(
+    spanFrom('<meta name="twitter:image:alt"', '>'),
+    `<meta name="twitter:image" content="${OG_IMAGE}" />`,
+    `<meta name="twitter:image:alt" content="${esc(COPY.og_image_alt)}" />`,
+    'after',
+    'early-bird twitter:image:alt'
+  );
+
+  // /early-bird/ keeps whatever was written into it last time, so moving the
+  // slot — as happened when the right-hand column turned out to be invisible —
+  // would otherwise leave the old copy behind in the old parent. Anything that
+  // is not exactly where it belongs is removed first; the inserts below then
+  // put a fresh copy in the right place. This covers a stale copy as well as a
+  // misplaced one, since both fail the same comparison.
+  for (const [place, anchor, where] of [
+    ['header', HEADER_SLOT, 'after'],
+    ['footer', FOOTER_SLOT, 'before'],
+  ]) {
+    const block = socialBlock(place);
+    const correct = where === 'before' ? `${block}\n${anchor}` : `${anchor}\n${block}`;
+    if (early.includes(correct)) continue;
+    const found = spanFrom(socialOpen(place), '</div>')(early);
+    if (found === null) continue;
+    if (CHECK) { earlyFailures.push(`early-bird ${place} social links are misplaced`); continue; }
+    early = early.includes(`\n${found}`)
+      ? early.replace(`\n${found}`, '')
+      : early.replace(found, '');
+  }
+
+  insertEarly(
+    spanFrom(socialOpen('header'), '</div>'),
+    HEADER_SLOT,
+    socialBlock('header'),
+    'after',
+    'early-bird header social links'
+  );
+  insertEarly(
+    spanFrom(socialOpen('footer'), '</div>'),
+    FOOTER_SLOT,
+    socialBlock('footer'),
+    'before',
+    'early-bird footer social links'
+  );
 
   failures.push(...earlyFailures);
   if (!CHECK && early !== before) fs.writeFileSync(EARLY, early);
@@ -783,6 +1097,19 @@ if (CHECK) {
     ['end actions', `${MARK}-actions`],
     ['json-ld', `class="${MARK}-schema"`],
     ['lang en-GB', '<html lang="en-GB"'],
+    ['favicon.ico', '<link rel="icon" href="/favicon.ico" sizes="any">'],
+    ['apple touch icon', '<link rel="apple-touch-icon" href="/assets/brand/apple-touch-icon.png">'],
+    ['web manifest', '<link rel="manifest" href="/site.webmanifest">'],
+    ['theme colour', '<meta name="theme-color" content="#2C2C2C">'],
+    ['og:image', `<meta property="og:image" content="${OG_IMAGE}" />`],
+    ['og:image:width', `<meta property="og:image:width" content="${OG_IMAGE_W}" />`],
+    ['og:image:height', `<meta property="og:image:height" content="${OG_IMAGE_H}" />`],
+    ['twitter:image', `<meta name="twitter:image" content="${OG_IMAGE}" />`],
+    ['twitter:image:alt', '<meta name="twitter:image:alt"'],
+    ['social stylesheet', `id="${MARK}-social-css"`],
+    ['facebook link', FACEBOOK_URL],
+    ['instagram link', INSTAGRAM_URL],
+    ['sameAs', `"sameAs":["${FACEBOOK_URL}","${INSTAGRAM_URL}"]`],
   ];
   const current = fs.readFileSync(PAGE, 'utf8');
   for (const [label, needle] of musts) {
@@ -847,6 +1174,84 @@ if (CHECK) {
   // before `failures` was ever read, so --check reported a clean run while the
   // patch pass had already given up on an edit — including every check on
   // /early-bird/, which is patched in place up in section 4g rather than here.
+  // The favicon, the share image and the two social links.
+  //
+  // Counted, not looked for. The old icon path was on the page four times and
+  // the old share image three, so "the new one is present" would have reported
+  // a clean run with the broken tags still sitting beside it — which is the
+  // exact shape of the bug this section was written to fix.
+  const strays = [
+    ['old favicon path', 'Azura_White_Logo__No_Background_'],
+    ['old share image', OG_IMAGE_OLD],
+  ];
+  for (const [label, needle] of strays) {
+    const n = current.split(needle).length - 1;
+    if (n) missing.push(`${label} still on the page (${n}x)`);
+  }
+  // One set of links in the bar and one in the footer. Two would be the tell
+  // that an insert ran twice; zero, that its idempotence marker matched
+  // something it should not have — which is how the first version of this
+  // silently skipped /early-bird/ because the marker was also a CSS rule name.
+  for (const place of ['header', 'footer']) {
+    const n = current.split(socialOpen(place)).length - 1;
+    if (n !== 1) missing.push(`${place} social links (${n}, expected 1)`);
+  }
+
+  // Every icon and image the head points at has to be a file that is actually
+  // in public/. Read out of the markup rather than listed here, so renaming an
+  // asset can never leave this gate checking a path the page no longer uses.
+  const REFS = new Set();
+  for (const m of current.matchAll(
+    /<link rel="(?:icon|apple-touch-icon|manifest)"[^>]*href="(\/[^"]+)"/g
+  )) REFS.add(m[1]);
+  REFS.add(new URL(OG_IMAGE).pathname);
+  for (const ref of REFS) {
+    const file = path.join(ROOT, 'public', ref.replace(/^\//, '').split('?')[0]);
+    if (!fs.existsSync(file)) missing.push(`asset missing: public${ref}`);
+    else if (fs.statSync(file).size < 400) missing.push(`asset looks empty: public${ref}`);
+  }
+  // The manifest names three more icons that nothing in the HTML links to, so
+  // the loop above cannot see them. An installed home-screen icon that 404s is
+  // a blank square, which is the failure this whole section is about.
+  const MANIFEST = path.join(ROOT, 'public', 'site.webmanifest');
+  if (fs.existsSync(MANIFEST)) {
+    let icons = [];
+    try {
+      icons = JSON.parse(fs.readFileSync(MANIFEST, 'utf8')).icons || [];
+    } catch { missing.push('site.webmanifest is not valid JSON'); }
+    if (icons.length !== 3) missing.push(`manifest icons (${icons.length} of 3)`);
+    if (!icons.some((i) => i.purpose === 'maskable')) missing.push('manifest maskable icon');
+    for (const i of icons) {
+      const f = path.join(ROOT, 'public', String(i.src).replace(/^\//, ''));
+      if (!fs.existsSync(f)) missing.push(`manifest icon missing: public${i.src}`);
+    }
+  }
+
+  // /early-bird/ gets the same treatment, asserted against the file that ships
+  // rather than against what the patch pass believes it did.
+  if (fs.existsSync(EARLY)) {
+    const eb = fs.readFileSync(EARLY, 'utf8');
+    const ebMusts = [
+      ['favicon.ico', '<link rel="icon" href="/favicon.ico" sizes="any">'],
+      ['web manifest', '<link rel="manifest" href="/site.webmanifest">'],
+      ['og:image', `<meta property="og:image" content="${OG_IMAGE}" />`],
+      ['og:image:width', `<meta property="og:image:width" content="${OG_IMAGE_W}" />`],
+      ['twitter:image:alt', '<meta name="twitter:image:alt"'],
+      ['social stylesheet', `id="${MARK}-social-css"`],
+      ['facebook link', FACEBOOK_URL],
+      ['instagram link', INSTAGRAM_URL],
+    ];
+    for (const [label, needle] of ebMusts) {
+      if (!eb.includes(needle)) missing.push(`early-bird ${label}`);
+    }
+    const ebStray = eb.split('Azura_White_Logo__No_Background_').length - 1;
+    if (ebStray) missing.push(`early-bird old favicon path (${ebStray}x)`);
+    for (const place of ['header', 'footer']) {
+      const n = eb.split(socialOpen(place)).length - 1;
+      if (n !== 1) missing.push(`early-bird ${place} social links (${n}, expected 1)`);
+    }
+  }
+
   missing.push(...failures);
 
   if (missing.length) {
@@ -855,7 +1260,8 @@ if (CHECK) {
   }
   console.log(
     `OK — all ${musts.length} SEO edits present in public/index.html, `
-      + 'and /early-bird/ carries its own title, description and lease wording'
+      + 'the icon set and share image resolve to real files, and /early-bird/ '
+      + 'carries its own title, description, lease wording and social links'
   );
   process.exit(0);
 }

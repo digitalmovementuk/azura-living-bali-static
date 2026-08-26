@@ -31,10 +31,32 @@ const poweredByDigitalMovement =
 // tag belongs to the old WordPress setup and could be removed at any time.
 const ga4MeasurementId = "G-Q8P7PZWE38";
 const ga4Snippet =
-  "\n<!-- Google Analytics 4 (Digital Movement) -->\n"
-  + "<script async src=\"https://www.googletagmanager.com/gtag/js?id=" + ga4MeasurementId + "\"></script>\n"
-  + "<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}"
-  + "gtag('js',new Date());gtag('config','" + ga4MeasurementId + "');</script>\n";
+  "\n<!-- Google Analytics 4 (Alex / Digital Movement) -->\n"
+  + "<script async data-azura-ga4 src=\"https://www.googletagmanager.com/gtag/js?id=" + ga4MeasurementId + "\"></script>\n"
+  + "<script data-azura-ga4>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}"
+  + "gtag('js',new Date());gtag('config','" + ga4MeasurementId + "');"
+  + "document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('a[href]');if(!a)return;"
+  + "var h=a.href||'';var kind=h.indexOf('wa.me/')>-1?'whatsapp':h.indexOf('widget/bookings/')>-1?'booking':h.indexOf('.pdf')>-1?'brochure':null;"
+  + "if(kind)gtag('event','generate_lead',{lead_source:kind,link_url:h,transport_type:'beacon'});},true);"
+  + "document.addEventListener('submit',function(e){gtag('event','generate_lead',{lead_source:'form',form_name:(e.target&&e.target.getAttribute('name'))||'website_form',transport_type:'beacon'});},true);</script>\n";
+
+function stripLegacyGoogleTags(text) {
+  return text
+    .replace(
+      /<!-- Google tag \(gtag\.js\) snippet added by Site Kit -->\s*<!-- Google Analytics snippet added by Site Kit -->\s*<script id="google_gtagjs-js"[\s\S]*?<\/script>\s*<script id="google_gtagjs-js-after">[\s\S]*?<\/script>\s*/g,
+      "",
+    )
+    .replace(
+      /<!-- Google Tag Manager snippet added by Site Kit -->[\s\S]*?<!-- End Google Tag Manager snippet added by Site Kit -->\s*/g,
+      "",
+    )
+    .replace(
+      /<!-- Google Tag Manager \(noscript\) snippet added by Site Kit -->[\s\S]*?<!-- End Google Tag Manager \(noscript\) snippet added by Site Kit -->\s*/g,
+      "",
+    )
+    .replace(/<meta name="generator" content="Site Kit by Google [^"]*"\s*\/?>/g, "")
+    .replace(/<link rel=['"]dns-prefetch['"] href=['"]\/\/(?:www\.|ssl\.)?google-analytics\.com['"]\s*\/?>\s*/gi, "");
+}
 
 const replacements = new Map([
   ["6281241960867", "6282322846087"],
@@ -341,7 +363,7 @@ const premiumMenuMarkup = `<nav id="azura-primary-menu" class="menu-popup" aria-
   <button type="button" class="menu-backdrop" aria-label="Close navigation menu" data-menu-close></button>`;
 
 function cleanMarkup(text) {
-  let output = text;
+  let output = stripLegacyGoogleTags(text);
   for (const [from, to] of replacements) output = output.replaceAll(from, to);
   // Sits directly after the charset meta so measurement starts as early as
   // possible. Guarded so a second mirror run cannot stack two copies.

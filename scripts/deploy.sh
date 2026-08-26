@@ -12,8 +12,14 @@ WT="$(mktemp -d)"
 
 # Refuse to ship a home page that lost its SEO edits, or a guide page built
 # from an older version of that home page.
+#
+# The brand assets go first: the favicon set and the share image are what the
+# HTML gates then check the markup against, and a rebuilt asset that no longer
+# matches its source would otherwise ship under a passing HTML check.
+python3 scripts/build-brand-assets.py --check
 node scripts/seo-patch.mjs --check
 node scripts/build-guide.mjs --check
+node scripts/analytics-cleanup.mjs --check
 
 git fetch origin gh-pages
 git worktree add --detach "$WT" origin/gh-pages
