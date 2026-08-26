@@ -152,7 +152,10 @@ function socialBlock(place) {
 // copy is on every breakpoint.
 const SOCIAL_CSS =
   `<style id="${MARK}-social-css">`
-  + `.${MARK}-social{display:flex;align-items:center;gap:10px}`
+  // Size and glyph come from two custom properties so that one rule can retune
+  // the whole chip. The bar and the menu match the page's own menu button;
+  // the footer keeps the smaller chip, where nothing sits beside it.
+  + `.${MARK}-social{display:flex;align-items:center;gap:10px;--chip:34px;--glyph:15px}`
   // The chip is opaque, and both colours are set outright rather than
   // inherited. Two reasons, both measured rather than assumed:
   //
@@ -164,20 +167,47 @@ const SOCIAL_CSS =
   //
   // And the theme hands no colour down to an <a>, so leaving the ring and the
   // glyph to inherit currentColor painted both the browser's default link blue.
-  + `.${MARK}-social-link{display:inline-flex;align-items:center;justify-content:center;`
-  + `width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.28);`
+  //
+  // Two class names, not one. Inside the drawer these links are also matched by
+  // the page's own `.menu-content a`, which is a class plus an element and so
+  // outranks a single class: on /early-bird/ that rule was giving them 13px of
+  // padding, an underline-style bottom border and a 15px slide on hover.
+  + `.${MARK}-social .${MARK}-social-link{box-sizing:border-box;display:inline-flex;`
+  + `align-items:center;justify-content:center;width:var(--chip);height:var(--chip);`
+  + `padding:0;margin:0;border-radius:50%;border:1px solid rgba(255,255,255,.28);`
   + `background:#2C2C2C;color:#fff;text-decoration:none;flex:0 0 auto;`
   + `transition:background-color .2s ease,border-color .2s ease,color .2s ease}`
-  + `.${MARK}-social-link:hover,.${MARK}-social-link:focus-visible`
-  + `{background:#D1A30A;border-color:#D1A30A;color:#2C2C2C;opacity:1}`
-  + `.${MARK}-social-link svg{width:15px;height:15px;fill:currentColor;display:block}`
-  // Clear of the menu button. That button is position:fixed at z-index 1000002
-  // and sits over the left of the bar, so the first chip was underneath it and
-  // unclickable — visible on a screenshot, invisible to every measurement that
-  // only asked where the links were. Its right edge is at x=85 at the widest
-  // (early-bird), the block starts at x=52, so 48px leaves a 15px gap.
-  + `.${MARK}-social--header{margin-left:48px}`
+  + `.${MARK}-social .${MARK}-social-link:hover,.${MARK}-social .${MARK}-social-link:focus-visible`
+  + `{background:#D1A30A;border-color:#D1A30A;color:#2C2C2C;opacity:1;transform:none}`
+  + `.${MARK}-social .${MARK}-social-link svg{width:var(--glyph);height:var(--glyph);`
+  + `fill:currentColor;display:block}`
+  // The bar. Three numbers, all read off the rendered page rather than guessed:
+  //
+  // 48px is the size of the menu button next to them, so the three controls in
+  // the bar are one set. `top:1px` lines their centres up with it — the column
+  // they sit in starts one pixel higher than the button.
+  //
+  // The 48px indent clears the menu button itself. That button is
+  // position:fixed at z-index 1000002 and sits over the left of the bar, so the
+  // first chip was underneath it and unclickable — visible on a screenshot,
+  // invisible to every measurement that only asked where the links were.
+  + `.${MARK}-social--header{--chip:48px;--glyph:20px;position:relative;top:1px;margin-left:48px}`
+  // Below 1024px the bar has already collapsed to the menu button, so the bar
+  // copy goes away and the drawer copy takes over.
   + `@media (max-width:1024px){.${MARK}-social--header{display:none}}`
+  // In the drawer. On the home page and the guide the parent is the contact
+  // panel, a flex column whose three children are ordered 1-3, so order:4 puts
+  // these last, under the WhatsApp line, and they fade in with the panel.
+  + `.${MARK}-social--menu{--chip:48px;--glyph:20px;order:4;align-self:center;`
+  + `justify-content:center;gap:14px;margin:20px 0 0}`
+  // /early-bird/ is a landing page without navigation. The client's own page
+  // CSS hides that whole widget — the button and the drawer behind it — at
+  // every width, so there is no menu button to match and no drawer to sit in.
+  // The chips keep the site's 48px size and line their centres up with the
+  // wordmark instead. The offset is measured with the chips already in place:
+  // they sit in the flow, so their own height moves the wordmark down with
+  // them, and an offset read off the page before the change lands 4px out.
+  + `.elementor-page-3556 .${MARK}-social--header{top:10px}`
   + `.${MARK}-social--footer{justify-content:center;margin:22px 0 2px}`
   + '</style>';
 
@@ -197,6 +227,10 @@ const HEADER_SLOT =
   + ' data-id="ab14076" data-element_type="container" data-e-type="container">';
 // The footer's bottom row, under the copyright line.
 const FOOTER_SLOT = '<div class="dm-powered-by"';
+// The last line inside the drawer's contact panel. Below 1024px the bar copy
+// is hidden, so on a phone this is the only place the profiles appear above
+// the fold — the drawer is the site's navigation there.
+const MENU_SLOT = 'Message the team</a>';
 
 /** Replace `from` with `to`; record a failure if `from` is not present. */
 function sub(html, from, to, label) {
@@ -389,6 +423,7 @@ if (!html.includes('name="twitter:image:alt"')) {
 // The two profile links: desktop bar, then footer.
 html = rewrite(html, HEADER_SLOT, HEADER_SLOT + socialBlock('header'), 'header social links');
 html = rewrite(html, FOOTER_SLOT, socialBlock('footer') + FOOTER_SLOT, 'footer social links');
+html = rewrite(html, MENU_SLOT, MENU_SLOT + socialBlock('menu'), 'menu social links');
 
 // ---------------------------------------------------------------------------
 // 2. JSON-LD — the mirrored graph advertises an Article by "Partner Azura".
@@ -804,6 +839,19 @@ if (fs.existsSync(EARLY)) {
     'before',
     'early-bird footer social links'
   );
+  // No drawer block on this page. It is patched in place, so a block that was
+  // added by an earlier run has to be taken out again rather than simply not
+  // written: sitting in a drawer that never opens, it would be markup nobody
+  // can ever see, and two of the render checks would have to be told to look
+  // away. If the client switches the menu back on, the render gate fails and
+  // says to put the block back.
+  {
+    const stale = spanFrom(socialOpen('menu'), '</div>')(early);
+    if (stale !== null) {
+      if (CHECK) earlyFailures.push('early-bird carries a drawer social block, but its drawer never opens');
+      else early = early.includes(`\n${stale}`) ? early.replace(`\n${stale}`, '') : early.replace(stale, '');
+    }
+  }
 
   // This page carries its own Organization node, and it uses the same @id as
   // the one on the home page — so it is the same company, described twice. It
@@ -1213,11 +1261,11 @@ if (CHECK) {
     const n = current.split(needle).length - 1;
     if (n) missing.push(`${label} still on the page (${n}x)`);
   }
-  // One set of links in the bar and one in the footer. Two would be the tell
+  // One set of links in the bar, one in the drawer and one in the footer. Two would be the tell
   // that an insert ran twice; zero, that its idempotence marker matched
   // something it should not have — which is how the first version of this
   // silently skipped /early-bird/ because the marker was also a CSS rule name.
-  for (const place of ['header', 'footer']) {
+  for (const place of ['header', 'footer', 'menu']) {
     const n = current.split(socialOpen(place)).length - 1;
     if (n !== 1) missing.push(`${place} social links (${n}, expected 1)`);
   }
@@ -1271,9 +1319,10 @@ if (CHECK) {
     }
     const ebStray = eb.split('Azura_White_Logo__No_Background_').length - 1;
     if (ebStray) missing.push(`early-bird old favicon path (${ebStray}x)`);
-    for (const place of ['header', 'footer']) {
+    // None in the drawer here: see the note above the removal step.
+    for (const [place, want] of [['header', 1], ['footer', 1], ['menu', 0]]) {
       const n = eb.split(socialOpen(place)).length - 1;
-      if (n !== 1) missing.push(`early-bird ${place} social links (${n}, expected 1)`);
+      if (n !== want) missing.push(`early-bird ${place} social links (${n}, expected ${want})`);
     }
   }
 
